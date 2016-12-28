@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 
-import time,traceback,socket,json,yaml,sys,logging
-from flask import Flask, make_response
-from flask_cors import CORS
+import time,traceback,socket,json,sys,logging
+from flask import Flask, make_response,render_template,request
+from flask_cors import CORS,cross_origin
 from threading import Lock,Thread
 
 app = Flask(__name__)
@@ -11,63 +11,95 @@ global nodeData
 nodeData = {}
 global isLocked
 isLocked = False
+global lock
+lock = Lock()
 
-def listener(ipv4, recv_port):
-        logging.info("Listener starting....")
-        # initialize receiver socket
-        recv_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        recv_sock.bind((ipv4, recv_port))
-        while True:
-           data = recv_sock.recv(8192)
-           lock.acquire()
-           isLocked = True
-           msg = yaml.safe_load(data)
-           msg["uptime"]=int(time.time())
-           nodeData[msg["uid"]] = msg
-           lock.release()
-           isLocked = False
+timeout = 15
+log = logging.getLogger('werkzeug')
+log.setLevel(logging.ERROR)
+starttimedetails = {}
+previoustimedetails = {}
+
+@app.route('/insertdata',methods=['GET', 'POST'])
+@cross_origin()
+def listener():
+	lock.acquire()
+	isLocked = True
+	msg = request.json
+	uid = msg["uid"]
+	if uid not in nodeData.keys():
+		starttimedetails.update({uid:msg["uptime"]})
+		
+	nodeData[uid] = msg
+	lock.release()
+	isLocked = False
+	return "200"
+
+@app.route('/IPOP')
+@cross_origin()
+def homepage():
+        ##logging.getLogger('flask_cors').level = logging.DEBUG
+    resp =  render_template('D3U.html')
+    return resp
+
+@app.route('/subgraphtemplate')
+@cross_origin()
+def getGraphTemplate():
+        ##logging.getLogger('flask_cors').level = logging.DEBUG
+    resp =  render_template('ipopsubgraphui.html')
+    return resp
+
+@app.route('/subgraph', methods=['GET', 'POST'])
+@cross_origin()
+def getGraph():
+    nodelist = str(request.query_string).split(",")
+    outputdata=[]
+    outputdatanodelist = []
+    for ele in nodelist:
+        if ele in nodeData.keys():
+            outputdata.append(nodeData[ele])
+            outputdatanodelist.append(ele)
+            for subele in nodeData[ele]["links"]["successor"]+nodeData[ele]["links"]["chord"]+nodeData[ele]["links"]["on_demand"]:
+                if subele not in nodelist and subele not in outputdatanodelist:
+                    temp = nodeData[subele]
+                    temp["links"]["successor"] = []
+                    temp["links"]["chord"]     = []
+                    temp["links"]["on_demand"] = []
+                    outputdata.append(temp)
+                    outputdatanodelist.append(subele)
+    responseMsg = {"response": outputdata}
+    resp = make_response(json.dumps(responseMsg))
+    resp.headers['Content-Type'] = "application/json"
+    return resp
 
 
 @app.route('/nodedata', methods=['GET', 'POST'])
+@cross_origin()
 def nodedata():
-        count = 0
-        while len(nodeData)==0:
-	    lock.acquire()
-            if count ==0:
-                thread_listener.start()
-            count+=1
-	    lock.release()
         while isLocked==True:
-            count = count
+            pass
         lock.acquire()
-        responseMsg = {"response": nodeData}
+        nodeDetailsList = []
+        for key,value in sorted(nodeData.items(),key= lambda x : x[0]):
+        	if int(time.time())-value["uptime"] > timeout:
+        		value["state"] = "stopped"
+        		value["startime"] = starttimedetails[key]
+        	nodeDetailsList.append(value)
+        print(nodeDetailsList)
+        responseMsg = {"response": nodeDetailsList}
         lock.release()
         resp = make_response(json.dumps(responseMsg))
         resp.headers['Content-Type'] = "application/json"
-        resp.headers['Access-Control-Allow-Origin'] = "*"
-        logging.info(json.dumps(nodeData))
         return resp
 
 
 
-def main():
-    app.run(debug=True,threaded=True)
+def main(ipv4):
+    app.run(host=ipv4,port=8080,threaded=True)
+
 
 if __name__ == "__main__":
+
     ipv4 = sys.argv[1]
-    port = int(sys.argv[2])
-    logging.basicConfig(filename="/home/vyassu/server.log",level=logging.INFO,format='%(asctime)s %(message)s')
-    try:
-        global lock
-        lock = Lock()
-        thread_listener = Thread(target=listener,args=(ipv4,port))
-        global count
-        main()
-    except:
-        logging.error(traceback.format_exc())
-        print(traceback.format_exc())
-        thread_listener.join(100)
-        sys.exit()
-
-    
-
+    main(ipv4)
+    logging.basicConfig(filename="./server.log",level=logging.INFO,format='%(asctime)s %(message)s')
