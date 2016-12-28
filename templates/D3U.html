@@ -1,0 +1,67 @@
+<html>
+<head>
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/d3_ipop.css') }}">
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/bootstrap.min.css') }}">
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/bootstrap.css') }}">
+  <title>IPOP Visualizer</title>
+  <script type="text/javascript" src="{{ url_for('static',filename='js/jQuery.js') }}"></script>
+  <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+  <script src="http://d3js.org/d3.v3.min.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+  <div>
+      <div class="row col-md-12 pageheader">
+          <div>IPOP Visualizer</div>
+      </div>
+      <div class="row col-md-12">
+        <div class="col-md-2" id="network" style="margin-left: 20px;">
+            <div class="row">
+                Use the below drop down to select the Link Type
+            </div>
+            <div class="dropdown row" style="padding-right:0px;padding-left: 55px;">
+              <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">
+                 Link Type
+                 <span class="caret"></span>
+              </button>
+              <ul class="dropdown-menu" onclick="enableLink(event)">
+                 <li><a href="#">successor</a></li>
+                 <li><a href="#">chord</a></li>
+                 <li><a href="#">ondemand</a></li>
+                 <li><a href="#">All</a></li>
+              </ul>
+            </div>
+            <div class="row">
+                <div id="text1">Click on the Nodes(not more than 10)</div>
+                <input type="button" id="getgraphstate" onclick="getsubgraph(event)" value="Get SubGraph" class="btn btn-default" style="margin:auto;background-color:grey;">
+                <input type="text" id="nodedisplaytext" readonly>
+                <input type="button" id="resetgraphstate" onclick="resetgraph(event)" value="Submit" class="btn btn-default" style="display:none;margin:auto;background-color: grey;">
+            </div>
+          </div>
+        <div class="col-md-7">
+            <div class="loader" id="loading"></div>
+            <div id="topology"></div>
+        </div>
+        <div class="col-md-2" id="NodeDetails" style="padding-left:0px; padding-right: 0px">
+        </div>
+        <div id="ModalDetails"></div>
+      </div>
+      <div class="row text-pos col-md-12" style="margin-top: 15px; border-top: 5px solid #f37021;">
+            <div class="col-md-3">
+              <div class="col-md-6">
+              </div>
+              <div class="col-md-6 footertext">
+                Powered By
+              </div>
+            </div>
+            <div class="col-md-5">
+                <img src="{{ url_for('static',filename='img/ACIS.JPG') }}" class="logo">
+            </div>
+            <div class="col-md-4" style="margin-top: 15px;">
+                <img src="{{ url_for('static',filename='img/UFlogo.png') }}" class="logo">
+            </div>
+      </div>
+  </div>
+</body>
+<script type="text/javascript" src="{{ url_for('static',filename='js/d3_ipop.js') }}"></script>
+</html>
