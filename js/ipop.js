@@ -5,15 +5,21 @@ var arcRadius= Math.min(svg_height/3,svg_width/3);
 var circlDetails = {};
 var timeOut= 10000;
 var oldcircleData = {};
-var nameUID={};
 var linktypes="";
 var canvas_center_x = svg_width/4;
 var canvas_center_y = svg_height/2;
-console.log(canvas_center_y);
-console.log(canvas_center_x);
+var modaltemplate = "<div id='myModal' class='modal'><div id='myModal_content'class='modal-content'><span class='close'>x</span><table id='NodeDetails'><col style='width:30%'><col style='width:70%'><tr><td class='keyclass'>UID</td><td class='valueclass'>$ui</td></tr><tr><td class='keyclass'>Node Name</td><td class='valueclass'>$nodename</td></tr><tr><td class='keyclass'>IPOP IP</td><td class='valueclass'>$ipopip</td></tr><tr><td class='keyclass'>Physical IP</td><td class='valueclass'>$phyip</td></tr><tr><td class='keyclass'>Location</td><td class='valueclass'>$loc</td></tr><tr><td class='keyclass'>State</td><td class='valueclass' id='myModal_state'>$state</td></tr></table><p><H3>Link Details</H3></p><table id='Link_Details'><tr><td class='keyclass'>Chord</td><td class='valueclass' id='myModal_chord'>$chord</td></tr><tr><td class='keyclass'>Successor</td><td class='valueclass' id='myModal_successor'>$successor</td></tr><tr><td class='keyclass'>Ondemand</td><td class='valueclass' id='myModal_ondemand'>$ondemand</td></tr><tr><td class='keyclass'>StartTime</td><td class='valueclass' id='myModal_starttime'>$starttime</td></tr></table><p><H3>Message Details</H3></p><table id='MessageDetails'><tr><td class='keyclass'>SendCount</td><td class='valueclass' id='myModal_sendcount'>$sendcount</td></tr><tr><td class='keyclass'>ReceiveCount</td><td class='valueclass' id='myModal_receivecount'>$receivecount</td></tr></table>$MACUIDMAP</div></div>";
+var geolocation;
+var disableoldclick=false;
+var subgraphcircledetails=[];
+
+var serverip = "172.16.110.182";
+var subgraphcount=0;
+var outputstr="";
+
 window.onload = function() {
         callWebservice();
-}
+    }
 
 
 function callWebservice()
@@ -21,9 +27,10 @@ function callWebservice()
 	$.ajax({
             type: "POST",
             method: "POST",
-            url: "http://localhost:5000/nodedata",
-            contentType: "application/json",
-            datatype:"text",
+            url: "http://"+serverip+":8080/nodedata",
+	            contentType: "application/json",
+	            datatype:"text",
+            crossDomain:true,
             timeout : 5000,
             success : function(data)
             {
@@ -33,11 +40,12 @@ function callWebservice()
             error: function(data)
             {
             	$("#loading").hide();
-            	//alert("IPOP Webservice is down!! Please check after sometime..");
+            	alert("IPOP Webservice is down!! Please check after sometime..");
             	console.log(data);
             }
         });
 }
+
 
 
 function makePage(data)
@@ -46,6 +54,14 @@ function makePage(data)
 	circlDetails = data.response;
 	var oldkeys = Object.keys(oldcircleData);
 	var newkeys = Object.keys(circlDetails);
+	if (newkeys.length > 20)
+	{
+		canvas_center_x += 50*((newkeys.length-20)/20);
+		canvas_center_y += 20*((newkeys.length-20)/20);
+		arcRadius+=55*((newkeys.length-20)/20);
+		var svgele = document.getElementById("svg");
+		svgele.setAttribute('height', '200%')
+	}
 	if ((oldkeys.length>0 && newkeys.length>oldkeys.length))
 		window.location.reload();
 	else
@@ -293,70 +309,65 @@ function countById(id,type)
 	return count;
 }
 
-function setText(element,x,y)
+function setText(element,type)
 {
 	var circle  = circlDetails[element];
-	var nodeName="	 Node Name : "+circle["name"]; 
-	var uid ="	uid : "+circle["uid"]; 
-	var ip = "  IPOP IP : "+circle["ip4"];
-	var PhyIP = "  Physical IP : "+circle["PHY_IP"];
-	var state="	State     : ";
-	var link="	#Links    : ";
-	var chord =" #Chord     : %chord%";
-	var uptime= " Uptime    : ";
+	var state="";
+	var uptime= "";
+	
 	if (oldcircleData[element]==undefined)
 	{
 		state = state + circle["state"];
-		temptime = circlDetails[element]["starttime"];
+		var temptime = circle["starttime"];
 		temptime = new Date(temptime*1000);
-		uptime = uptime + temptime.toString();
 	}
 	else
 	{
-		temptime = oldcircleData[element]["starttime"];
+		var temptime = oldcircleData[element]["starttime"];
 		temptime = new Date(temptime*1000);
 		state = state + oldcircleData[element]["state"];
-		uptime = uptime+ temptime.toString();
 	}
-	var noOfSuccessor = countById(element,"successor");
-	var noOfondemand = countById(element,"on_demand");
-	var noOfchord = countById(element,"chord");
-	tempsucc = " #successor:  "+noOfSuccessor;
-	tempondemand=" #ondemandLinks: "+noOfondemand;
-	var totalLinks = noOfchord+noOfSuccessor+noOfondemand
-	link= link + totalLinks;
-	tempchord = chord.replace("%chord%",noOfchord);
-	
-	var tempList = {
-					"nodeName":nodeName,
-					"IPOP IP Address": ip,
-					"Physical IP Address":PhyIP,
-					"uid":uid,
-					"state":state,
-					"link":link,
-					"chord":tempchord,
-					"successors": tempsucc,
-					"ondemand": tempondemand,
-					"time":uptime
-				};
-    var i=0;
-	for( details in tempList)
-	{		
-		if(document.getElementById(element+"_text_"+details)==undefined)
-		{
-			var el= document.createElementNS('http://www.w3.org/2000/svg', "tspan");
-			if (i!=0)
-				el.setAttribute("dy",20);
-			else
-				el.setAttribute("y",y);
-			el.setAttribute("x",x);
-			el.setAttribute("id",element+"_text_"+details);
-			el.innerHTML = tempList[details];
-			document.getElementById(element+"_text").appendChild(el);
-			i++;
-		}
-		else
-			document.getElementById(element+"_text_"+details).innerHTML = tempList[details];
+
+	var macuidmappingstr = "<p id='"+element+"_modal_maccontent'"+"><H3>UID- MAC Details</H3><table id='macidmapping'>";
+	for (obj in circle["macuidmapping"])
+	{
+		if (circlDetails[obj] != undefined)
+			macuidmappingstr = macuidmappingstr+ "<tr><th>Node Name</th><th>Unique ID</th><th> MAC Details</th></tr><tr><td  class='keyclass'>"+circlDetails[obj]["name"]+"</td><td>"+obj+"</td><td>"+circle["macuidmapping"][obj].join()+"</td></tr>";
+	}
+	macuidmappingstr = macuidmappingstr+"</table></p>"
+
+	if (type=="new")
+	{
+		var modalele = modaltemplate;
+		modalele = modalele.replace(/myModal/g,element+"_modal");
+		modalele = modalele.replace("$nodename",circle["name"]);
+		modalele = modalele.replace("$ui",circle["uid"]);
+		modalele = modalele.replace("$ipopip",circle["ip4"]);
+		modalele = modalele.replace("$phyip",circle["PHY_IP"]);
+		//getGeolocationDetails(circle["PHY_IP"]);
+		uptime = uptime + temptime.toString();
+		modalele = modalele.replace("$starttime",uptime);
+		modalele = modalele.replace("$successor",countById(element,"successor"));
+		modalele = modalele.replace("$ondemand",countById(element,"on_demand"));
+		modalele = modalele.replace("$chord",countById(element,"chord"));
+		
+
+		modalele = modalele.replace("$state",state);
+		modalele = modalele.replace("$receivecount",circle["receivecount"]);
+		modalele = modalele.replace("$sendcount",circle["sendcount"]);
+		modalele = modalele.replace("$MACUIDMAP",macuidmappingstr);
+		return modalele;
+	}
+	else
+	{
+		document.getElementById(element+"_modal_successor").innerHTML 	= countById(element,"successor");
+		document.getElementById(element+"_modal_ondemand").innerHTML 	= countById(element,"on_demand");
+		document.getElementById(element+"_modal_chord").innerHTML 		= countById(element,"chord");
+		document.getElementById(element+"_modal_sendcount").innerHTML 	= circle["sendcount"];
+		document.getElementById(element+"_modal_receivecount").innerHTML= circle["receivecount"];
+		document.getElementById(element+"_modal_state").innerHTML 		= state;
+		$('#'+element+"_modal_maccontent").remove();
+		$('#'+element+"_modal_maccontent").append(macuidmappingstr);
 	}
 }
 
@@ -382,90 +393,31 @@ function enableLink(event)
 
 function insertIP(element,x,y)
 {
-	var newx=0,newy=0;
-	if ((x < canvas_center_x) && (y==canvas_center_y))
-	{
-		newx= x-40;
-		newy= y-10;
-	}
-	else if ((x > canvas_center_x) && (y==canvas_center_y))
-	{
-		newx= x+15;
-		newy= y-10;
-	}
-	else if ((x== canvas_center_x) && (y<canvas_center_y))
-	{
-		newx= x-25;
-		newy= y-20;
-	}
-	else if ((x== canvas_center_x) && (y>canvas_center_y))
-	{
-		newx= x-25;
-		newy= y+30;
-	}
-	else if ((x < canvas_center_x) && (y<canvas_center_y))
-	{
-		newx= x-60;
-		newy= y-20;
-	}
-	else if ((x <= canvas_center_x) && (y>canvas_center_y))
-	{
-		newx= x-80;
-		newy= y+30;
-	}
-	else if ((x > canvas_center_x) && (y<canvas_center_y))
-	{
-		newx= x;
-		newy= y-20;
-	}
-	else
-	{
-		newx= x-10;
-		newy= y+30;
-	}
-
+	var newx=x,newy=y;
 	var circle  = circlDetails[element];
 	var el= document.createElementNS('http://www.w3.org/2000/svg', "text");
-	el.setAttribute("x", newx);
+	el.setAttribute("x", newx-5);
 	el.setAttribute("y", newy);
-	el.setAttribute("id", "IP_text");
+	el.setAttribute("id", element+"IP_text");
 	el.setAttribute("fill", "white");
-	el.innerHTML = circle["ip4"];
+	el.innerHTML = circle["name"];
 	document.getElementById('svg').appendChild(el);
 }
-
-
 
 function insertData(element,type)
 {
 	if(type=="new")	
-	{
+	{	
 		var cirElement = circlDetails[element];
 		var x = cirElement["center"][0];
 		var y = cirElement["center"][1];
-			
-		var el1= document.createElementNS('http://www.w3.org/2000/svg', "rect");
-		el1.setAttribute("x", x+30);
-		el1.setAttribute("y", y-30);
-		el1.setAttribute("class","boxStyle")
-		el1.setAttribute("id", element+"_rect");
-		el1.setAttribute("width", 500);
-		el1.setAttribute("height", 220);
-		document.getElementById('svg').appendChild(el1);
-
-
-		var el= document.createElementNS('http://www.w3.org/2000/svg', "text");
-		el.setAttribute("x", x+30);
-		el.setAttribute("y", y);
-		el.setAttribute("class","textStyle")
-		el.setAttribute("id", element+"_text");
-		el.setAttribute("fill", "white");
-		document.getElementById('svg').appendChild(el);
-		setText(element,x+40,y);
 		insertIP(element,x,y);
+		$('#modaldata').append(setText(element,type));
 	}
 	else
-		setText(element,x+40,y);
+	{
+		setText(element,type);
+	}	
 }
 
 
@@ -492,40 +444,48 @@ function disableText()
 
 function displayText(event)
 {
-	var elementName = event["target"]["id"];
-	var clickelement= undefined;
+	var elementName="";
+	var clickelement;
+	var modalElement;
+	
+	if (event["target"]["className"] != "close")
+	{
+		var elementID="";
+        if (event["target"]["id"]!="")
+        {
+            elementID = ""+event["target"]["id"];
+            elementName = elementID.replace("IP_text","");
+        }
+	}
+	else
+	{
+		elementID = event["target"]["parentNode"]["offsetParent"]["id"];
+		elementName = elementID.substring(0,elementID.length-6);
+	}
+	
 	if (oldcircleData[elementName]!=undefined)
-	    clickelement = 	oldcircleData[elementName];
+		clickelement = 	oldcircleData[elementName];
 	else if (circlDetails[elementName]!=undefined)
 		clickelement = circlDetails[elementName];
 	else
-		disableText();
+		clickelement= undefined;
 
-	if (clickelement!=undefined || clickelement!= null)	
+	if (event["target"]["className"] != "close")
 	{
-		if ((clickelement["isDisplayed"]==false) && elementName!= null)
+		if (clickelement!=undefined || clickelement!= null)
 		{
-			var rectelement = document.getElementById(elementName+"_rect");
-			rectelement.parentNode.appendChild(rectelement);
-			rectelement.style.display = 'block';
-			var textelement = document.getElementById(elementName+"_text");
-			textelement.style.display = 'block';
-			textelement.parentNode.appendChild(textelement);
-			clickelement["isDisplayed"]= true;
-		}
-		else
-		{
-			document.getElementById(elementName+"_rect").style.display = 'none';
-			document.getElementById(elementName+"_text").style.display = 'none';
-			clickelement["isDisplayed"]= false;
+			modalElement = document.getElementById(elementName+"_modal");
+			modalElement.style.display = "block";
 		}
 	}
-
-	if (oldcircleData[elementName]!=undefined)
-	    oldcircleData[elementName] = clickelement;
 	else
-		circlDetails[elementName] = clickelement;
-	
+	{
+		if (clickelement!=undefined || clickelement!= null)
+		{
+			modalElement = document.getElementById(elementID);
+			modalElement.style.display = "none";
+		}
+	}
 }
 
 
@@ -594,10 +554,50 @@ function setLeftText()
 function getClick()
 {
 	$($("body")).click(function(event) {
+		if (disableoldclick==false)
 			displayText(event);
+		else
+		{
+			document.getElementById("text1").style.display = "block";
+			getsubgraph(event);
+		}
 	 });
 }
 getClick();
+
+function getsubgraph(event)
+{
+	disableoldclick = true;
+	var target = event["target"]["id"];
+	var elementName = "";
+	var elementName = target.replace("IP_text","");
+	if (circlDetails[elementName] != undefined)
+	{
+		var circleName = circlDetails[elementName]["name"];
+		if ($.inArray(elementName,subgraphcircledetails)==-1)
+		{
+			outputstr+=(circleName+",");
+			document.getElementById("nodedisplaytext").setAttribute("value",outputstr);
+			subgraphcircledetails.splice(subgraphcircledetails.length+1, 0, elementName);	
+		}
+	}
+	document.getElementById("resetgraphstate").style.display = "block";
+	document.getElementById("getgraphstate").style.display = "none";
+	document.getElementById("nodedisplaytext").style.display = "block";
+}
+
+function resetgraph(event)
+{
+	disableoldclick = false;
+	localStorage.setItem("subgraphelements", subgraphcircledetails.toString());
+	document.getElementById("nodedisplaytext").setAttribute("value","");
+	subgraphcircledetails.length=0;
+	outputstr="";
+	document.getElementById("resetgraphstate").style.display = "none";
+	document.getElementById("nodedisplaytext").style.display = "none";
+	document.getElementById("getgraphstate").style.display = "block";
+	window.open("http://"+serverip+":8080/subgraphtemplate", "SubGraph"+subgraphcount, "width=500,height=500");
+}
 
 function rightClick()
 {
@@ -605,18 +605,5 @@ function rightClick()
     		return false;
 	}); 
 }
-
-angular
-.module('IPOPApplication', ['ngMaterial'])
-            .controller('sideNavController', sideNavController);
-
-          function sideNavController ($scope, $mdSidenav) {
-             $scope.openLeftMenu = function() {
-               $mdSidenav('left').toggle();
-             };
-			 $scope.openRightMenu = function() {
-               $mdSidenav('right').toggle();
-             };
-         }
 
 setInterval(callWebservice,timeOut);               //Refresh Interval of 1 min= 60 * 1000 millisec	
