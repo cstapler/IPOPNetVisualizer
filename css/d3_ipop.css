@@ -30,7 +30,6 @@ body {
 }
 
 .link {
-  stroke: grey;
   stroke-opacity: 1;
   fill: none;
   pointer-events: all;
@@ -164,4 +163,3 @@ body {
   font-size: 10px;
   color: grey;
 }
-
