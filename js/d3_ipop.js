@@ -5,6 +5,8 @@ window.onload = function() {
 var serverip = "172.16.110.182";
 var subgraphNodeDetails = [], subgraphNodeNameDetails = [];
 var disableoldclick = false;
+var lenofdata = 0;
+
 var texttemplate = "<div id='text_element' class='textbox'><p><div class='heading'>General Details</div></p><table id='NodeDetails'><tr><td class='keyclass'>UID</td><td class='valueclass'>$ui</td></tr><tr><td class='keyclass'>Node Name</td><td class='valueclass'>$nodename</td></tr><tr><td class='keyclass'>IPOP IP</td><td class='valueclass'>$ipopip</td></tr><tr><td class='keyclass'>Physical IP</td><td class='valueclass'>$phyip</td></tr><tr><td class='keyclass'>Location</td><td class='valueclass'>$loc</td></tr><tr><td class='keyclass'>State</td><td class='valueclass' id='text_element_state'>$state</td></tr></table><p><div class='heading'>Link Details</div></p><table id='Link_Details'><tr><td class='keyclass'>Chord</td><td class='valueclass' id='text_element_chord'>$chord</td></tr><tr><td class='keyclass'>Successor</td><td class='valueclass' id='text_element_successor'>$successor</td></tr><tr><td class='keyclass'>Ondemand</td><td class='valueclass' id='text_element_ondemand'>$ondemand</td></tr><tr><td class='keyclass'>StartTime</td><td class='valueclass' id='text_element_starttime'>$starttime</td></tr></table><p><div class='heading'>Message Details</div></p><table id='MessageDetails'><tr><td class='keyclass'>SendCount</td><td class='valueclass' id='text_element_sendcount'>$sendcount</td></tr><tr><td class='keyclass'>ReceiveCount</td><td class='valueclass' id='text_element_receivecount'>$receivecount</td></tr></table>$MACUIDMAP</div></div>";
 var modaltemplate = "<div id='myModal' class='modal'><div id='myModal_content'class='modal-content'><span class='close' onclick='closemodal(event);'>x</span><table id='NodeDetails'><col style='width:30%'><col style='width:70%'><tr><td class='keyclass'>UID</td><td class='valueclass'>$ui</td></tr><tr><td class='keyclass'>Node Name</td><td class='valueclass'>$nodename</td></tr><tr><td class='keyclass'>IPOP IP</td><td class='valueclass'>$ipopip</td></tr><tr><td class='keyclass'>Physical IP</td><td class='valueclass'>$phyip</td></tr><tr><td class='keyclass'>Location</td><td class='valueclass'>$loc</td></tr><tr><td class='keyclass'>State</td><td class='valueclass' id='myModal_state'>$state</td></tr></table><p><H3>Link Details</H3></p><table id='Link_Details'><tr><td class='keyclass'>Chord</td><td class='valueclass' id='myModal_chord'>$chord</td></tr><tr><td class='keyclass'>Successor</td><td class='valueclass' id='myModal_successor'>$successor</td></tr><tr><td class='keyclass'>Ondemand</td><td class='valueclass' id='myModal_ondemand'>$ondemand</td></tr><tr><td class='keyclass'>StartTime</td><td class='valueclass' id='myModal_starttime'>$starttime</td></tr></table><p><H3>Message Details</H3></p><table id='MessageDetails'><tr><td class='keyclass'>SendCount</td><td class='valueclass' id='myModal_sendcount'>$sendcount</td></tr><tr><td class='keyclass'>ReceiveCount</td><td class='valueclass' id='myModal_receivecount'>$receivecount</td></tr></table>$MACUIDMAP</div></div>";
 var diameter = 960,
@@ -31,25 +33,56 @@ var svg = d3.select("#topology").append("svg")
   .append("g")
     .attr("transform", "translate(" + radius + "," + radius + ")");
 
-var link = svg.append("g").selectAll(".link"),
+var classes = [];
+var link = svg.selectAll(".link"),
     node = svg.selectAll(".node");
 
-var classes = [];
-
+var nodes;
 function callWebservice(state){
 d3.json("http://"+serverip+":8080/nodedata", function(error, data) {
   if (error) throw error;
   classes = data["response"];
-  var nodes = cluster.nodes(packageHierarchy(classes)),
+
+  if (lenofdata==0)
+    lenofdata = classes.length;
+  nodes = cluster.nodes(packageHierarchy(classes)),
       links = connections(nodes);
+      
+  link  = svg.selectAll(".link").data(bundle(links));
   
-  if (state == "new")
-    link = svg.append("g").selectAll(".link").data(bundle(links)).enter();
-  else
-    link  = svg.selectAll(".link").data(bundle(links));
-    link.append("path")
-      .each(function(d) {d.source = d[0], d.target = d[d.length - 1]})
+  link.enter().append("path")
+      .each(function(d) {
+
+        var d_0_state = d[0]["state"],
+            d_2_state = d[2]["state"];
+
+        if (d_0_state=="stopped" || d_2_state=="stopped")
+        {
+          var pele = svg.selectAll(".link");
+          pele[0].forEach(function(element,i)
+          {
+            if (element["id"].indexOf(d[0]["name"])!=-1 && d_0_state=="stopped")
+              document.getElementById(element["id"]).style.display = "none";
+            if (element["id"].indexOf(d[2]["name"])!=-1 && d_2_state=="stopped")
+              document.getElementById(element["id"]).style.display = "none";
+          });
+        }
+
+        d.source = d[0], d.target = d[d.length - 1]})
       .attr("class", "link")
+      .attr("stroke",function(d){
+        dest_name  = d[2].key;
+        if (Object.keys(d[0]).indexOf("links")!=-1)
+        {
+          if (d[0].links.on_demand.indexOf(dest_name)!= -1)
+            return "#333133";
+          if (d[0].links.successor.indexOf(dest_name)!= -1)
+            return "#4B4949";
+          if (d[0].links.chord.indexOf(dest_name)!= -1)
+            return "#333333";
+        }
+        
+      })
       .attr("style", "display=block;")
       .attr("d", line)
 	  .attr("id", function(d)
@@ -68,14 +101,9 @@ d3.json("http://"+serverip+":8080/nodedata", function(error, data) {
 	  .on("mouseover", linkmouseover)
 	  .on("mouseout", linkmouseout);
 
-  if (state == "new")
-  {
-    node = node.data(nodes.filter(function(n) { return !n.children; }))
-      .enter().append("g")
-      .call(force.drag);
-  }
-
-	node.append("circle")
+  node = svg.selectAll(".node").data(nodes.filter(function(n) { return !n.children; })); 
+  node1 = svg.selectAll(".node").data(nodes.filter(function(n) { return !n.children; })); 
+	node.enter().append("circle")
       .attr("class", "node")
       .attr("fill", function(d){
         if (d["state"] == "connected")
@@ -90,18 +118,26 @@ d3.json("http://"+serverip+":8080/nodedata", function(error, data) {
       })
       .attr("dy", ".31em")
 	    .attr("r", "10")
-      .attr("transform", function(d) { return "rotate(" + (d.x - 90) + ")translate(" + (d.y + 8) + ",0)" + (d.x < 180 ? "" : "rotate(180)"); })
+      .attr("transform", function(d) { 
+        return "rotate(" + (d.x - 90) + ")translate(" + (d.y + 8) + ",0)" + (d.x < 180 ? "" : "rotate(180)"); })
       .style("text-anchor", function(d) { return d.x < 180 ? "start" : "end"; })
       .on("mouseover", mouseovered)
       .on("mouseout", mouseouted)
       .on("click", mouseclick);
 	  
-	node.append("text")
+	node1.enter().append("text")
       .attr("fill", "black")
       .attr("dy", ".31em")
       .attr("transform", function(d) { return "rotate(" + (d.x - 90) + ")translate(" + (d.y + 28) + ",0)" + (d.x < 180 ? "" : "rotate(180)"); })
       .style("text-anchor", function(d) { return d.x < 180 ? "start" : "end"; })
       .text(function(d) { return d.node_name; });
+
+  link.exit().remove();
+  node.exit().remove();
+  node1.exit().remove();
+
+  if (lenofdata !=node[0].length)
+      location.reload();
 });
 }
 
@@ -248,16 +284,16 @@ function packageHierarchy(classes) {
 }
 
 // Return a list of imports for the given array of nodes.
-function connections(nodes) {
+function connections(elenodes) {
   var map = {},
   conns = [];
 
   // Compute a map from name to node.
-  nodes.forEach(function(d) {
+  elenodes.forEach(function(d) {
     map[d.name] = d;
   });
 
-  nodes.forEach(function(d) {
+  elenodes.forEach(function(d) {
     if (Object.keys(d).indexOf("links")!=-1)
     { 
         if (d.links.successor) d.links.successor.forEach(function(i) {
@@ -267,6 +303,7 @@ function connections(nodes) {
           conns.push({source: map[d.name], target: map[i],"type":"ondemand"});
         });
     	if (d.links.chord) d.links.chord.forEach(function(i) {
+        if (d.links.successor.indexOf(map[i]["name"])==-1)
           conns.push({source: map[d.name], target: map[i],"type":"chord"});
         });
     }
@@ -336,7 +373,7 @@ function setText(d)
   else
   {
     document.getElementById("text_"+element+"_successor").innerHTML   = countById(element,"successor");
-    document.getElementById("text_"+element+"_ondemand").innerHTML  = countById(element,"ondemand");
+    document.getElementById("text_"+element+"_ondemand").innerHTML  = countById(element,"on_demand");
     document.getElementById("text_"+element+"_chord").innerHTML     = countById(element,"chord");
     document.getElementById("text_"+element+"_sendcount").innerHTML   = circle["sendcount"];
     document.getElementById("text_"+element+"_receivecount").innerHTML= circle["receivecount"];
@@ -350,18 +387,32 @@ function setText(d)
 function countById(id,type)
 {
   var count=0;
+  var elementconns = [];
+  console.log(nodes);
+
+  nodes.forEach(function(element,i)
+  {
+    if (Object.keys(element).indexOf("name")!=-1)
+    {
+      if(element["name"]==id)
+        elementconns = element["links"][type];
+    }
+  });
+
   link[0].forEach(function(element,i)
   {
-    var element_id = element["id"];
+    var element_id = element["id"].split("_");
     var state = element["style"]["display"];
-    if(id=="*"&&(element_id.include(type)==true))
+    if(id=="*"&&(element_id[0].includes(type)==true))
       count++;
     else
     {
-      if((element_id.includes(id)==true)&&(element_id.includes(type)==true))
+      if((element_id[2].includes(id)==true)&&(elementconns.indexOf(element_id[1])==-1)&&(element_id[0].includes(type)==true))
         count++;
     }
   });
+  if (type=="successor")
+    count+=elementconns.length;
   return count;
 }
 
