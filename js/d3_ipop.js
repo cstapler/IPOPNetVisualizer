@@ -2,13 +2,13 @@ window.onload = function() {
         callWebservice("new");
     }
 
-var serverip = "172.16.110.182";
+var serverip = "";
 var subgraphNodeDetails = [], subgraphNodeNameDetails = [];
 var disableoldclick = false;
 var lenofdata = 0;
 
-var texttemplate = "<div id='text_element' class='textbox'><p><div class='heading'>General Details</div></p><table id='NodeDetails'><tr><td class='keyclass'>UID</td><td class='valueclass'>$ui</td></tr><tr><td class='keyclass'>Node Name</td><td class='valueclass'>$nodename</td></tr><tr><td class='keyclass'>IPOP IP</td><td class='valueclass'>$ipopip</td></tr><tr><td class='keyclass'>Physical IP</td><td class='valueclass'>$phyip</td></tr><tr><td class='keyclass'>Location</td><td class='valueclass'>$loc</td></tr><tr><td class='keyclass'>State</td><td class='valueclass' id='text_element_state'>$state</td></tr></table><p><div class='heading'>Link Details</div></p><table id='Link_Details'><tr><td class='keyclass'>Chord</td><td class='valueclass' id='text_element_chord'>$chord</td></tr><tr><td class='keyclass'>Successor</td><td class='valueclass' id='text_element_successor'>$successor</td></tr><tr><td class='keyclass'>Ondemand</td><td class='valueclass' id='text_element_ondemand'>$ondemand</td></tr><tr><td class='keyclass'>StartTime</td><td class='valueclass' id='text_element_starttime'>$starttime</td></tr></table><p><div class='heading'>Message Details</div></p><table id='MessageDetails'><tr><td class='keyclass'>SendCount</td><td class='valueclass' id='text_element_sendcount'>$sendcount</td></tr><tr><td class='keyclass'>ReceiveCount</td><td class='valueclass' id='text_element_receivecount'>$receivecount</td></tr></table>$MACUIDMAP</div></div>";
-var modaltemplate = "<div id='myModal' class='modal'><div id='myModal_content'class='modal-content'><span class='close' onclick='closemodal(event);'>x</span><table id='NodeDetails'><col style='width:30%'><col style='width:70%'><tr><td class='keyclass'>UID</td><td class='valueclass'>$ui</td></tr><tr><td class='keyclass'>Node Name</td><td class='valueclass'>$nodename</td></tr><tr><td class='keyclass'>IPOP IP</td><td class='valueclass'>$ipopip</td></tr><tr><td class='keyclass'>Physical IP</td><td class='valueclass'>$phyip</td></tr><tr><td class='keyclass'>Location</td><td class='valueclass'>$loc</td></tr><tr><td class='keyclass'>State</td><td class='valueclass' id='myModal_state'>$state</td></tr></table><p><H3>Link Details</H3></p><table id='Link_Details'><tr><td class='keyclass'>Chord</td><td class='valueclass' id='myModal_chord'>$chord</td></tr><tr><td class='keyclass'>Successor</td><td class='valueclass' id='myModal_successor'>$successor</td></tr><tr><td class='keyclass'>Ondemand</td><td class='valueclass' id='myModal_ondemand'>$ondemand</td></tr><tr><td class='keyclass'>StartTime</td><td class='valueclass' id='myModal_starttime'>$starttime</td></tr></table><p><H3>Message Details</H3></p><table id='MessageDetails'><tr><td class='keyclass'>SendCount</td><td class='valueclass' id='myModal_sendcount'>$sendcount</td></tr><tr><td class='keyclass'>ReceiveCount</td><td class='valueclass' id='myModal_receivecount'>$receivecount</td></tr></table>$MACUIDMAP</div></div>";
+var texttemplate = "<div id='text_element' class='textbox'><p><div class='heading'>General Details</div></p><table id='NodeDetails'><tr><td class='keyclass'>UID</td><td class='valueclass'>$ui</td></tr><tr><td class='keyclass'>Node Name</td><td class='valueclass'>$nodename</td></tr><tr><td class='keyclass'>IPOP IP</td><td class='valueclass'>$ipopip</td></tr><tr><td class='keyclass'>Physical IP</td><td class='valueclass'>$phyip</td></tr><tr><td class='keyclass'>State</td><td class='valueclass' id='text_element_state'>$state</td></tr></table><p><div class='heading'>Link Details</div></p><table id='Link_Details'><tr><td class='keyclass'>Chord</td><td class='valueclass' id='text_element_chord'>$chord</td></tr><tr><td class='keyclass'>Successor</td><td class='valueclass' id='text_element_successor'>$successor</td></tr><tr><td class='keyclass'>Ondemand</td><td class='valueclass' id='text_element_ondemand'>$ondemand</td></tr><tr><td class='keyclass'>StartTime</td><td class='valueclass' id='text_element_starttime'>$starttime</td></tr></table><p><div class='heading'>Message Details</div></p><table id='MessageDetails'><tr><td class='keyclass'>SendCount</td><td class='valueclass' id='text_element_sendcount'>$sendcount</td></tr><tr><td class='keyclass'>ReceiveCount</td><td class='valueclass' id='text_element_receivecount'>$receivecount</td></tr></table></div></div>";
+var modaltemplate = "<div id='myModal' class='modal'><div id='myModal_content'class='modal-content'><span class='close' onclick='closemodal(event);'>x</span><table id='NodeDetails'><col style='width:30%'><col style='width:70%'><tr><td class='keyclass'>UID</td><td class='valueclass'>$ui</td></tr><tr><td class='keyclass'>Node Name</td><td class='valueclass'>$nodename</td></tr><tr><td class='keyclass'>IPOP IP</td><td class='valueclass'>$ipopip</td></tr><tr><td class='keyclass'>Physical IP</td><td class='valueclass'>$phyip</td></tr><tr><td class='keyclass'>State</td><td class='valueclass' id='myModal_state'>$state</td></tr></table><p><H3>Link Details</H3></p><table id='Link_Details'><tr><td class='keyclass'>Chord</td><td class='valueclass' id='myModal_chord'>$chord</td></tr><tr><td class='keyclass'>Successor</td><td class='valueclass' id='myModal_successor'>$successor</td></tr><tr><td class='keyclass'>Ondemand</td><td class='valueclass' id='myModal_ondemand'>$ondemand</td></tr><tr><td class='keyclass'>StartTime</td><td class='valueclass' id='myModal_starttime'>$starttime</td></tr></table><p><H3>Message Details</H3></p><table id='MessageDetails'><tr><td class='keyclass'>SendCount</td><td class='valueclass' id='myModal_sendcount'>$sendcount</td></tr><tr><td class='keyclass'>ReceiveCount</td><td class='valueclass' id='myModal_receivecount'>$receivecount</td></tr></table>$MACUIDMAP</div></div>";
 var diameter = 960,
     radius = diameter / 2,
     innerRadius = radius - 120;
@@ -42,7 +42,6 @@ function callWebservice(state){
 d3.json("http://"+serverip+":8080/nodedata", function(error, data) {
   if (error) throw error;
   classes = data["response"];
-
   if (lenofdata==0)
     lenofdata = classes.length;
   nodes = cluster.nodes(packageHierarchy(classes)),
@@ -340,14 +339,6 @@ function setText(d)
   var temptime = circle["starttime"];
   temptime = new Date(temptime*1000);
 
-  var macuidmappingstr = "<p id='"+element+"text_maccontent'><div class='heading'>UID- MAC Details</div><table id='macidmapping'>";
-  for (obj in circle["macuidmapping"])
-  {
-    if (circlDetails[obj] != undefined)
-      macuidmappingstr = macuidmappingstr+ "<tr><th>Node Name</th><th>Unique ID</th><th> MAC Details</th></tr><tr><td  class='keyclass'>"+circle["name"]+"</td><td>"+obj+"</td><td>"+circle["macuidmapping"][obj].join()+"</td></tr>";
-  }
-  macuidmappingstr = macuidmappingstr+"</table></p>";
-
   if (document.getElementById("text_"+element)==null)
   {
     var textele = texttemplate;
@@ -356,18 +347,15 @@ function setText(d)
     textele = textele.replace("$ui",circle["uid"]);
     textele = textele.replace("$ipopip",circle["ip4"]);
     textele = textele.replace("$phyip",circle["PHY_IP"]);
-    //getGeolocationDetails(circle["PHY_IP"]);
     uptime = uptime + temptime.toString();
     textele = textele.replace("$starttime",uptime);
     textele = textele.replace("$successor",countById(element,"successor"));
     textele = textele.replace("$ondemand",countById(element,"on_demand"));
     textele = textele.replace("$chord",countById(element,"chord"));
     
-
     textele = textele.replace("$state",state);
     textele = textele.replace("$receivecount",circle["receivecount"]);
     textele = textele.replace("$sendcount",circle["sendcount"]);
-    textele = textele.replace("$MACUIDMAP",macuidmappingstr);
     $("#NodeDetails").append(textele);
   }
   else
@@ -378,8 +366,6 @@ function setText(d)
     document.getElementById("text_"+element+"_sendcount").innerHTML   = circle["sendcount"];
     document.getElementById("text_"+element+"_receivecount").innerHTML= circle["receivecount"];
     document.getElementById("text_"+element+"_state").innerHTML     = state;
-    $("#"+element+"text_maccontent").remove();
-    $("#"+element+"text_maccontent").append(macuidmappingstr);
     document.getElementById("text_"+element).style.display = "block";
   }
 }
@@ -388,7 +374,6 @@ function countById(id,type)
 {
   var count=0;
   var elementconns = [];
-  console.log(nodes);
 
   nodes.forEach(function(element,i)
   {
@@ -407,8 +392,18 @@ function countById(id,type)
       count++;
     else
     {
-      if((element_id[2].includes(id)==true)&&(elementconns.indexOf(element_id[1])==-1)&&(element_id[0].includes(type)==true))
-        count++;
+      if (type == "successor")
+	  {
+	  	if((element_id[2].includes(id)==true)&&(elementconns.indexOf(element_id[1])==-1)&&(element_id[0].includes(type)==true))
+	        count++;
+	  }
+	  else
+	  {
+	  	if((element_id[2].includes(id)==true)&&(elementconns.indexOf(element_id[1])==-1)&&(element_id[0].includes(type)==true))
+	        count++;
+	    else if (element_id[1].includes(id)==true &&(element_id[0].includes(type)==true))
+	    	count++;
+	  }
     }
   });
   if (type=="successor")
@@ -425,12 +420,15 @@ function setModalText(d,type)
   state = state + circle["state"];
   var temptime = circle["starttime"];
   temptime = new Date(temptime*1000);
-
-  var macuidmappingstr = "<p id='"+element+"_modal_maccontent'"+"><H3>UID- MAC Details</H3><table id='macidmapping'>";
+  var macuidmappingstr = "<p id='"+element+"_modal_maccontent'"+"><H3>UID- MAC Details</H3><table id='macidmapping'><tr><th width='15%'>Node Name</th><th width='45%' align='center'>Unique ID</th><th width='40%'> MAC Details</th></tr>";
   for (obj in circle["macuidmapping"])
   {
-    if (circlDetails[obj] != undefined)
-      macuidmappingstr = macuidmappingstr+ "<tr><th>Node Name</th><th>Unique ID</th><th> MAC Details</th></tr><tr><td  class='keyclass'>"+circlDetails[obj]["name"]+"</td><td>"+obj+"</td><td>"+circle["macuidmapping"][obj].join()+"</td></tr>";
+    var i;
+    for (i=0;i<node[0].length-1;i++)
+    {
+      if (obj == node[0][i]["__data__"]["key"])
+        macuidmappingstr = macuidmappingstr+ "<tr><td padding='10px'>"+node[0][i]["__data__"]["node_name"]+"</td><td>"+obj+"</td><td>"+circle["macuidmapping"][obj].join()+"</td></tr>";
+    }
   }
   macuidmappingstr = macuidmappingstr+"</table></p>"
 
@@ -488,13 +486,14 @@ function resetgraph(event)
   disableoldclick = false;
   localStorage.setItem("subgraphelements", subgraphNodeDetails.toString());
   document.getElementById("nodedisplaytext").setAttribute("value","");
-  subgraphNodeDetails.length=0;
-  subgraphNodeNameDetails.length=0;
   document.getElementById("resetgraphstate").style.display = "none";
   document.getElementById("nodedisplaytext").style.display = "none";
   document.getElementById("getgraphstate").style.display = "block";
   window.open("http://"+serverip+":8080/subgraphtemplate", "SubGraph"+subgraphcount, "width=500,height=500");
+  //window.open("http://"+serverip+":8080/subgraphdetails?"+subgraphNodeDetails.toString(), "SubGraph"+subgraphcount, "width=500,height=500");
   subgraphcount+=1;
+  subgraphNodeDetails.length=0;
+  subgraphNodeNameDetails.length=0;
 }
 
 setInterval(callWebservice,7500);
