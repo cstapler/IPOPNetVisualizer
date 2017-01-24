@@ -58,12 +58,14 @@ def getGraphDetailsTemplate():
 def getNodeDetails(nodelist):
     outputdata=[]
     outputdatanodelist = []
+    temp={}
     for ele in nodeData.keys():
         elelinklist = nodeData[ele]["links"]["successor"]+nodeData[ele]["links"]["chord"]+nodeData[ele]["links"]["on_demand"]
         if ele in nodelist:
             nodeData[ele]["starttime"] = starttimedetails[ele]
             outputdata.append(nodeData[ele])
             outputdatanodelist.append(ele)
+
             for subele in elelinklist:
                 if subele not in nodelist and subele not in outputdatanodelist:
                     temp = nodeData[subele]
@@ -100,7 +102,7 @@ def getGraph():
 @cross_origin()
 def getURIGraph():
     nodelist = str(request.query_string).split(",")
-    print(nodelist)
+    #print(nodelist)
     outputdata = getNodeDetails(nodelist)
     responseMsg = {"response": outputdata}
     resp = make_response(json.dumps(responseMsg))
