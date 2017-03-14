@@ -395,7 +395,7 @@ function setModalText(d,type)
     modalele = modalele.replace("$nodename",circle["node_name"]);
     modalele = modalele.replace("$ui",circle["uid"]);
     modalele = modalele.replace("$ipopip",circle["ip4"]);
-    modalele = modalele.replace("$phyip",circle["PHY_IP"]);
+    modalele = modalele.replace("$phyip",circle["GeoIP"]);
     uptime = uptime + temptime.toString();
     modalele = modalele.replace("$starttime",uptime);
     modalele = modalele.replace("$successor",countById(element,"successor"));

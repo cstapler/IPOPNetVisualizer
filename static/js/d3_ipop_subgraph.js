@@ -335,7 +335,7 @@ function setText(d)
     textele = textele.replace("$nodename",circle["node_name"]);
     textele = textele.replace("$ui",circle["uid"]);
     textele = textele.replace("$ipopip",circle["ip4"]);
-    textele = textele.replace("$phyip",circle["PHY_IP"]);
+    textele = textele.replace("$phyip",circle["GeoIP"]);
     //getGeolocationDetails(circle["PHY_IP"]);
     uptime = uptime + temptime.toString();
     textele = textele.replace("$starttime",uptime);
