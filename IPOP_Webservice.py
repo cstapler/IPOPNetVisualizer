@@ -26,16 +26,19 @@ starttimedetails = {}
 @app.route('/insertdata',methods=['GET', 'POST'])
 @cross_origin()
 def listener():
-	lock.acquire()
-	isLocked = True
-	msg = request.json
-	uid = msg["uid"]
-	if uid not in nodeData.keys():
-		starttimedetails.update({uid:msg["uptime"]})	
-	nodeData[uid] = msg
-	lock.release()
-	isLocked = False
-	return "200"
+    lock.acquire()
+    isLocked = True
+    msg = request.json
+    uid = msg["uid"]
+    if uid not in nodeData.keys():
+        starttimedetails.update({uid:msg["uptime"]})
+    else:
+        if msg["uptime"]- nodeData[uid]["uptime"] > timeout:
+            nodeData[uid]["state"] = "stopped"
+    nodeData[uid].update(msg)
+    lock.release()
+    isLocked = False
+    return "200"
 
 #Displays the IPOP Homepage
 @app.route('/IPOP')
@@ -80,8 +83,8 @@ def setNodeData(nodeName,nodelist,runningnodelist):
 def getNodeStatus():
     stoppedNodes,runningNodes = [],[]
     for key,value in nodeData.items():
-        if int(time.time())-value["uptime"] > timeout:
-            value["state"] = "stopped"
+        #if int(time.time())-value["uptime"] > timeout:
+        if value["state"] == "stopped":
             stoppedNodes.append(str(key+" - "+value["node_name"]))
         else:
             runningNodes.append(key)
@@ -150,6 +153,7 @@ def getURIGraph():
     try:
         lock.acquire()
         outputdata = getNodeDetails(nodelist)
+        lock.release()
     except Exception as err:
         lock.release()
         logging.error("Exception in Sub graph node details:"+str(err))
