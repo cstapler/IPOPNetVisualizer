@@ -34,7 +34,7 @@ def listener():
         starttimedetails.update({uid:msg["uptime"]})
         nodeData[uid] = msg
     else:
-        if msg["uptime"]- nodeData[uid]["uptime"] > timeout:
+        if msg["uptime"]- nodeData[uid]["uptime"] == 0:
             nodeData[uid]["state"] = "stopped"
         nodeData[uid].update(msg)
     lock.release()
