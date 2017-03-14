@@ -32,10 +32,11 @@ def listener():
     uid = msg["uid"]
     if uid not in nodeData.keys():
         starttimedetails.update({uid:msg["uptime"]})
+        nodeData[uid] = msg
     else:
         if msg["uptime"]- nodeData[uid]["uptime"] > timeout:
             nodeData[uid]["state"] = "stopped"
-    nodeData[uid].update(msg)
+        nodeData[uid].update(msg)
     lock.release()
     isLocked = False
     return "200"
