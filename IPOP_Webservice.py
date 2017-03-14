@@ -34,9 +34,9 @@ def listener():
         starttimedetails.update({uid:msg["uptime"]})
         nodeData[uid] = msg
     else:
+        nodeData[uid].update(msg)
         if msg["uptime"]- nodeData[uid]["uptime"] == 0:
             nodeData[uid]["state"] = "stopped"
-        nodeData[uid].update(msg)
     lock.release()
     isLocked = False
     return "200"
