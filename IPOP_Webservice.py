@@ -32,13 +32,8 @@ def listener():
     uid = msg["uid"]
     if uid not in nodeData.keys():
         starttimedetails.update({uid:msg["uptime"]})
-        nodeData[uid] = msg
-    else:
-        if msg["uptime"]- nodeData[uid]["uptime"] == 0:
-            nodeData[uid].update(msg)
-            nodeData[uid]["state"] = "stopped"
-        else:
-            nodeData[uid].update(msg)
+    nodeData[uid] = msg
+    nodeData[uid]["lastupdatetime"] = int(time.time())
     lock.release()
     isLocked = False
     return "200"
@@ -86,8 +81,8 @@ def setNodeData(nodeName,nodelist,runningnodelist):
 def getNodeStatus():
     stoppedNodes,runningNodes = [],[]
     for key,value in nodeData.items():
-        #if int(time.time())-value["uptime"] > timeout:
-        if value["state"] == "stopped":
+        if int(time.time())- value["lastupdatetime"] > timeout:
+            value["state"] == "stopped"
             stoppedNodes.append(str(key+" - "+value["node_name"]))
         else:
             runningNodes.append(key)
