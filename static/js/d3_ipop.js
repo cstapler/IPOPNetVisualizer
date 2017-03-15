@@ -48,8 +48,10 @@ d3.json("http://"+serverip+":8080/nodedata", function(error, data) {
   if (lenofdata==0)
     lenofdata = classes.length;
   if (data["response"]["runningnodes"].length ==0)
+  {
     setStoppedNodes(data["response"]["stoppednodes"]);
     return;
+  }
   nodes = cluster.nodes(packageHierarchy(classes)),
       links = connections(nodes);
 
