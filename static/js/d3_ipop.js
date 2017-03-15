@@ -2,7 +2,7 @@ window.onload = function() {
         callWebservice("new");
     }
 
-var serverip = "localhost";
+var serverip = "$server_ip_address";
 var subgraphNodeDetails = [], subgraphNodeNameDetails = [];
 var disableoldclick = false;
 var lenofdata = 0;
