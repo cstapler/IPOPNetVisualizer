@@ -10,11 +10,14 @@ app = Flask(__name__)
 app.secret_key = 'IPOP UI'
 CORS(app)
 
+
+
 #Initializing Global variables
 global nodeData,isLocked,lock
 nodeData = {}
 isLocked = False
 lock = Lock()
+stopnodelist = []
 
 timeout = 15
 log = logging.getLogger('werkzeug')
@@ -86,6 +89,9 @@ def getNodeStatus():
             stoppedNodes.append(str(key+" - "+value["node_name"]))
         else:
             runningNodes.append(key)
+            nodedetail = str(key+" - "+value["node_name"])
+            if nodedetail in stopnodelist:
+                stopnodelist.remove(nodedetail)
     return stoppedNodes,runningNodes
 
 # Gets the node details for Sub-Graph functionality
@@ -180,7 +186,7 @@ def nodedata():
         responseMsg = {
             "response": {
                             "runningnodes": nodeDetailsList,
-                            "stoppednodes": stoppedNodes
+                            "stoppednodes": stopnodelist
                         }
             }
         lock.release()
@@ -207,6 +213,7 @@ def cleanNodeDetails():
                 nodeuid,nodename = nodeele.split(" - ")
                 if nodeuid in nodeData.keys():
                     del nodeData[nodeuid]
+                    stopnodelist.append(nodeele)
             lock.release()
         except Exception as err:
             lock.release()

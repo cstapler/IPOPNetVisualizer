@@ -2,7 +2,7 @@ window.onload = function() {
         callWebservice("new");
     }
 
-var serverip = "$server_ip_address";
+var serverip = "localhost";
 var subgraphNodeDetails = [], subgraphNodeNameDetails = [];
 var disableoldclick = false;
 var lenofdata = 0;
@@ -30,7 +30,10 @@ var line = d3.svg.line.radial()
 var svg = d3.select("#topology").append("svg")
     .attr("width", diameter)
     .attr("height", diameter)
-  .append("g")
+    .call(d3.behavior.zoom().on("zoom", function () {
+    svg.attr("transform", "translate(" + d3.event.translate + ")" + " scale(" + d3.event.scale + ")")
+    }))
+    .append("g")
     .attr("transform", "translate(" + radius + "," + radius + ")");
 
 var classes = [];
@@ -44,6 +47,9 @@ d3.json("http://"+serverip+":8080/nodedata", function(error, data) {
   classes = data["response"]["runningnodes"];
   if (lenofdata==0)
     lenofdata = classes.length;
+  if (classes.length ==0)
+    setStoppedNodes(data["response"]["stoppednodes"]);
+    return;
   nodes = cluster.nodes(packageHierarchy(classes)),
       links = connections(nodes);
 
