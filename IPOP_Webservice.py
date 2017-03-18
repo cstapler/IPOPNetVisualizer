@@ -30,16 +30,19 @@ starttimedetails = {}
 @app.route('/insertdata',methods=['GET', 'POST'])
 @cross_origin()
 def listener():
-    lock.acquire()
-    isLocked = True
-    msg = request.json
-    uid = msg["uid"]
-    if uid not in nodeData.keys():
-        starttimedetails.update({uid:msg["uptime"]})
-    nodeData[uid] = msg
-    nodeData[uid]["lastupdatetime"] = int(time.time())
-    #uid_mac_table.update(nodeData[uid]["macuidmapping"])
-    lock.release()
+    try:
+        lock.acquire()
+        isLocked = True
+        msg = request.json
+        uid = msg["uid"]
+        if uid not in nodeData.keys():
+            starttimedetails.update({uid:msg["uptime"]})
+        nodeData[uid] = msg
+        nodeData[uid]["lastupdatetime"] = int(time.time())
+        #uid_mac_table.update(nodeData[uid]["macuidmapping"])
+        lock.release()
+    except:
+        lock.release()
     isLocked = False
     return "200"
 
