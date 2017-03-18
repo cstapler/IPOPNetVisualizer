@@ -1,8 +1,8 @@
 <html>
 <head>
-  <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/d3_ipop.css') }}">
   <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/bootstrap.min.css') }}">
   <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/bootstrap.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/d3_ipop.css') }}">
   <title>IPOP Subgraph Visualizer</title>
   <script type="text/javascript" src="{{ url_for('static',filename='js/jQuery.js') }}"></script>
   <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
@@ -14,7 +14,7 @@
       <div class="row col-md-12">
         <div class="col-md-8">
             <div class="loader" id="loading"></div>
-            <div id="subgraphtopology"></div>
+            <div id="topology"></div>
         </div>
         <div class="col-md-4" id="NodeDetails" style="padding-left:0px; padding-right: 0px">
         </div>
@@ -37,5 +37,6 @@
       </div>
   </div>
 </body>
-<script type="text/javascript" src="{{ url_for('static',filename='js/d3_ipop_subgraph.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static',filename='js/ipop_common.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static',filename='js/subgraphdetails.js') }}"></script>
 </html>
