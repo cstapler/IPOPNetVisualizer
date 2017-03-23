@@ -18,11 +18,11 @@ nodeData = {}
 isLocked = False
 lock = Lock()
 stopnodelist = []
-uid_mac_table={"2056e396b0678129ba5828681057a36202e9aded": ["6200FDD58F57"], "a8bab5f612364de09bcfe5a51547c70f0e71326a": ["46EE89D96812"], "36970ad9b2cf08e561de38c247d0328997453807": ["BEA12985DA39"], "8f1d8e93ce41a1d85404603d5fee51b2f83f4c2f": ["1EAFB2833E4A"], "72d2a0db8ae9db7d591b8e3c854c200e3c763c23": ["227BE5AD9A8E", "00163ED32A7A"]}
+unmanaged_node_table = {}
 
 timeout = 15
-#log = logging.getLogger('werkzeug')
-#log.setLevel(logging.ERROR)
+log = logging.getLogger('werkzeug')
+log.setLevel(logging.ERROR)
 
 starttimedetails = {}
 
@@ -39,7 +39,7 @@ def listener():
             starttimedetails.update({uid:msg["uptime"]})
         nodeData[uid] = msg
         nodeData[uid]["lastupdatetime"] = int(time.time())
-        #uid_mac_table.update(nodeData[uid]["macuidmapping"])
+        unmanaged_node_table.update({uid : nodeData[uid]['unmanagednodelist']})
         lock.release()
     except:
         lock.release()
@@ -206,10 +206,11 @@ def getunmanagednodedetails():
         "response": []
     }
     nodelist = []
-    if nodeuid in uid_mac_table.keys():
-        unmanagednodes = uid_mac_table[nodeuid]
+    if nodeuid in unmanaged_node_table.keys():
+        unmanagednodes = unmanaged_node_table[nodeuid]
+	localip        = nodeData[nodeuid]['ip4']
         nodedetails = {
-            "name": nodeuid,
+            "name": localip,
             "links": {
                 "successor": unmanagednodes
             }
@@ -219,7 +220,7 @@ def getunmanagednodedetails():
             nodedetails = {
                 "name"   : node,
                 "links" : {
-                    "successor" : [nodeuid]
+                    "successor" : [localip]
                 }
             }
             nodelist.append(nodedetails)
