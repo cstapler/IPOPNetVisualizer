@@ -95,7 +95,7 @@ body {
     outline-color: grey;
     outline-width: 1px;
 }
-#subgraptopology {
+.topology {
     overflow-x: scroll;
     overflow-y: hidden;
     outline-style: solid;
@@ -132,6 +132,7 @@ body {
     font-size: 15px;
     line-height: 100%;
     overflow-x:auto;
+
 }
 
 /* The Close Button */

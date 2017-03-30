@@ -1,6 +1,13 @@
-var texttemplate = "<div id='text_element' class='textbox'><p><div class='heading'>General Details</div></p><table id='NodeDetails'><tr><td class='keyclass'>UID</td><td class='valueclass'>$ui</td></tr><tr><td class='keyclass'>Node Name</td><td class='valueclass'>$nodename</td></tr><tr><td class='keyclass'>IPOP IP</td><td class='valueclass'>$ipopip</td></tr><tr><td class='keyclass'>Physical IP</td><td class='valueclass'>$phyip</td></tr><tr><td class='keyclass'>State</td><td class='valueclass' id='text_element_state'>$state</td></tr></table><p><div class='heading'>Link Details</div></p><table id='Link_Details'><tr><td class='keyclass'>Chord</td><td class='valueclass' id='text_element_chord'>$chord</td></tr><tr><td class='keyclass'>Successor</td><td class='valueclass' id='text_element_successor'>$successor</td></tr><tr><td class='keyclass'>Ondemand</td><td class='valueclass' id='text_element_ondemand'>$ondemand</td></tr><tr><td class='keyclass'>StartTime</td><td class='valueclass' id='text_element_starttime'>$starttime</td></tr></table><p><div class='heading'>Message Details</div></p><table id='MessageDetails'><tr><td class='keyclass'>SendCount</td><td class='valueclass' id='text_element_sendcount'>$sendcount</td></tr><tr><td class='keyclass'>ReceiveCount</td><td class='valueclass' id='text_element_receivecount'>$receivecount</td></tr></table></div></div>";
-var modaltemplate = "<div id='myModal' class='modal'><div id='myModal_content'class='modal-content'><span class='close' onclick='closemodal(event);'>x</span><table id='NodeDetails'><col style='width:30%'><col style='width:70%'><tr><td class='keyclass'>UID</td><td class='valueclass'>$ui</td></tr><tr><td class='keyclass'>Node Name</td><td class='valueclass'>$nodename</td></tr><tr><td class='keyclass'>IPOP IP</td><td class='valueclass'>$ipopip</td></tr><tr><td class='keyclass'>Physical IP</td><td class='valueclass'>$phyip</td></tr><tr><td class='keyclass'>State</td><td class='valueclass' id='myModal_state'>$state</td></tr></table><p><H3>Link Details</H3></p><table id='Link_Details'><tr><td class='keyclass'>Chord</td><td class='valueclass' id='myModal_chord'>$chord</td></tr><tr><td class='keyclass'>Successor</td><td class='valueclass' id='myModal_successor'>$successor</td></tr><tr><td class='keyclass'>Ondemand</td><td class='valueclass' id='myModal_ondemand'>$ondemand</td></tr><tr><td class='keyclass'>StartTime</td><td class='valueclass' id='myModal_starttime'>$starttime</td></tr></table><p><H3>Message Details</H3></p><table id='MessageDetails'><tr><td class='keyclass'>SendCount</td><td class='valueclass' id='myModal_sendcount'>$sendcount</td></tr><tr><td class='keyclass'>ReceiveCount</td><td class='valueclass' id='myModal_receivecount'>$receivecount</td></tr></table>$MACUIDMAP</div></div>";
-var diameter = 800,
+var texttemplate = "<div id='text_element' class='textbox'><p><div class='heading'>General Details</div></p><table id='NodeDetails'><tr><td class='keyclass'>UID</td><td class='valueclass'>$ui</td></tr><tr><td class='keyclass'>Node Name</td><td class='valueclass'>$nodename</td></tr><tr><td class='keyclass'>IPOP IP</td><td class='valueclass'>$ipopip</td></tr><tr><td class='keyclass'>GEO IP</td><td class='valueclass'>$phyip</td></tr><tr><td class='keyclass'>State</td><td class='valueclass' id='text_element_state'>$state</td></tr><tr><td class='keyclass'>StartTime</td><td class='valueclass' id='text_element_starttime'>$starttime</td></tr></table><p><div class='heading'>Link Details</div></p><table id='Link_Details'><tr><td class='keyclass'>Chord</td><td class='valueclass' id='text_element_chord'>$chord</td></tr><tr><td class='keyclass'>Successor</td><td class='valueclass' id='text_element_successor'>$successor</td></tr><tr><td class='keyclass'>Ondemand</td><td class='valueclass' id='text_element_ondemand'>$ondemand</td></tr></table><p><div class='heading'>Message Details</div></p><table id='MessageDetails'><tr><td class='keyclass'>SendCount</td><td class='valueclass' id='text_element_sendcount'>$sendcount</td></tr><tr><td class='keyclass'>ReceiveCount</td><td class='valueclass' id='text_element_receivecount'>$receivecount</td></tr></table></div></div>";
+
+var modaltemplate = "<div id='myModal' class='modal'><div id='myModal_content'class='modal-content'><span class='close' onclick='closemodal(event);'>x</span><div id='myModal_table_content' style='display:block;'><table id='NodeDetails'><col style='width:30%'><col style='width:70%'><tr><td class='keyclass'>UID</td><td class='valueclass'>$ui</td></tr><tr><td class='keyclass'>Node Name</td><td class='valueclass'>$nodename</td></tr><tr><td class='keyclass'>IPOP IP</td><td class='valueclass'>$ipopip</td></tr><tr><td class='keyclass'>Geo IP</td><td class='valueclass'>$phyip</td></tr><tr><td class='keyclass'>State</td><td class='valueclass' id='myModal_state'>$state</td></tr><tr><td class='keyclass'>StartTime</td><td class='valueclass' id='text_element_starttime'>$starttime</td></tr></table><p><H3>Link Details</H3></p><table id='Link_Details'><tr><td class='keyclass'>Chord</td><td class='valueclass' id='myModal_chord'>$chord</td></tr><tr><td class='keyclass'>Successor</td><td class='valueclass' id='myModal_successor'>$successor</td></tr><tr><td class='keyclass'>Ondemand</td><td class='valueclass' id='myModal_ondemand'>$ondemand</td></tr></table><p><H3>Message Details</H3></p><table id='MessageDetails'><tr><td class='keyclass'>SendCount</td><td class='valueclass' id='myModal_sendcount'>$sendcount</td></tr><tr><td class='keyclass'>ReceiveCount</td><td class='valueclass' id='myModal_receivecount'>$receivecount</td></tr></table>$MACUIDMAP</div><div id='managednode_topology_myModal' class='topology'></div><input type='button' id='myModal_getunmanagednodes' onclick='getunmanagednodes(event);' value='Switch Topology' class='btn btn-default' style='background-color:grey;'><input type='button' id='myModal_back' onclick='back(event);' value='Back' class='btn btn-default' style='background-color:grey;display:none;' align='right'></div></div>";
+
+var serverip = "$server_ip_address";
+
+// Flag to enable/disable subgraph node selection
+var disableoldclick = false;
+
+var diameter = 960,
     radius = diameter / 2,
     innerRadius = radius - 120;
 
@@ -10,7 +17,7 @@ var cluster = d3.layout.cluster()
     .value(function(d) { return d.size; });
 
 var lenofdata = 0;
-	
+
 var force = d3.layout.force();
 var bundle = d3.layout.bundle();
 
@@ -20,7 +27,7 @@ var line = d3.svg.line.radial()
     .radius(function(d) { return d.y; })
     .angle(function(d) { return d.x / 180 * Math.PI; });
 
-var svg = d3.select("#subgraphtopology").append("svg")
+var svg = d3.select("#topology").append("svg")
     .attr("width", diameter)
     .attr("height", diameter)
   .append("g")
@@ -28,18 +35,17 @@ var svg = d3.select("#subgraphtopology").append("svg")
 
 var link = svg.selectAll(".link"),
     node = svg.selectAll(".node");
-var nodes;
-var classes = [];
 
-function makePage(data,state) {
-  classes = JSON.parse(data);
-  if (lenofdata==0)
-    lenofdata = classes.length;
-  nodes = cluster.nodes(packageHierarchy(classes)),
+var nodes;
+
+function buildnetworktopology()
+{
+    var nodelist = arguments[0];
+    nodes = cluster.nodes(packageHierarchy(nodelist)),
       links = connections(nodes);
-      
+
   link  = svg.selectAll(".link").data(bundle(links));
-  
+
   link.enter().append("path")
       .each(function(d) {
 
@@ -71,7 +77,7 @@ function makePage(data,state) {
           if (d[0].links.chord.indexOf(dest_name)!= -1)
             return "#333333";
         }
-        
+
       })
       .attr("style", "display=block;")
       .attr("d", line)
@@ -91,8 +97,8 @@ function makePage(data,state) {
     .on("mouseover", linkmouseover)
     .on("mouseout", linkmouseout);
 
-  node = svg.selectAll(".node").data(nodes.filter(function(n) { return !n.children; })); 
-  node1 = svg.selectAll(".node").data(nodes.filter(function(n) { return !n.children; })); 
+  node = svg.selectAll(".node").data(nodes.filter(function(n) { return !n.children; }));
+  node1 = svg.selectAll(".node").data(nodes.filter(function(n) { return !n.children; }));
   node.enter().append("circle")
       .attr("class", "node")
       .attr("fill", function(d){
@@ -108,13 +114,13 @@ function makePage(data,state) {
       })
       .attr("dy", ".31em")
       .attr("r", "10")
-      .attr("transform", function(d) { 
+      .attr("transform", function(d) {
         return "rotate(" + (d.x - 90) + ")translate(" + (d.y + 8) + ",0)" + (d.x < 180 ? "" : "rotate(180)"); })
       .style("text-anchor", function(d) { return d.x < 180 ? "start" : "end"; })
       .on("mouseover", mouseovered)
       .on("mouseout", mouseouted)
       .on("click", mouseclick);
-    
+
   node1.enter().append("text")
       .attr("fill", "black")
       .attr("dy", ".31em")
@@ -122,7 +128,12 @@ function makePage(data,state) {
       .style("text-anchor", function(d) { return d.x < 180 ? "start" : "end"; })
       .text(function(d) { return d.node_name; });
 
+   link.exit().remove();
+   node.exit().remove();
+   node1.exit().remove();
+
 }
+
 
 function linktype(source_keys,dest_name,ltype,torf,d)
 {
@@ -162,7 +173,7 @@ function mouseovered(d) {
   node
       .each(function(n) { n.target = n.source = false; });
   link[0]
-      .forEach(function(l) { 
+      .forEach(function(l) {
     l = l["__data__"]
     if (l[0].key == d.name || l[2].key == d.name)
   	{
@@ -174,7 +185,7 @@ function mouseovered(d) {
         	  linktype(source_keys,dest_name,"successor",true,l);
         	  linktype(source_keys,dest_name,"chord",true,l);
         	  //this.parentNode.appendChild(this);
-        } 
+        }
     }
     });
   node
@@ -185,7 +196,10 @@ function mouseovered(d) {
 function mouseclick(d)
 {
   var element = d["name"];
-  if(document.getElementById(element+"_modal")==null)
+
+  if (disableoldclick == false)
+  {
+    if(document.getElementById(element+"_modal")==null)
     {
       $('#ModalDetails').append(setModalText(d,"new"));
       document.getElementById(element+"_modal").style.display = "block";
@@ -200,11 +214,21 @@ function mouseclick(d)
       else
         document.getElementById(element+"_modal").style.display = "none";
     }
+  }
+  else
+  {
+      if (subgraphNodeDetails.indexOf(element)==-1)
+      {
+        subgraphNodeDetails.push(element);
+        subgraphNodeNameDetails.push(d["node_name"]);
+      }
+      document.getElementById("nodedisplaytext").setAttribute("value",subgraphNodeNameDetails.join());
+  }
 }
 
 function mouseouted(d) {
   link[0]
-      .forEach(function(l) { 
+      .forEach(function(l) {
     l = l["__data__"]
     if (l[0].key == d.name || l[2].key == d.name)
     {
@@ -215,7 +239,7 @@ function mouseouted(d) {
             linktype(source_keys,dest_name,"on_demand",false,l);
             linktype(source_keys,dest_name,"successor",false,l);
             linktype(source_keys,dest_name,"chord",false,l);
-        } 
+        }
     }
     });
 
@@ -229,9 +253,9 @@ function mouseouted(d) {
 
 d3.select(self.frameElement).style("height", diameter + "px");
 
-function packageHierarchy(classes) {
+function packageHierarchy() {
   var map = {};
-
+  var classes = arguments[0];
   function find(name, data) {
 
     var node = map[name], i;
@@ -254,9 +278,10 @@ function packageHierarchy(classes) {
 }
 
 // Return a list of imports for the given array of nodes.
-function connections(elenodes) {
+function connections() {
   var map = {},
   conns = [];
+  var elenodes = arguments[0];
 
   // Compute a map from name to node.
   elenodes.forEach(function(d) {
@@ -265,7 +290,7 @@ function connections(elenodes) {
 
   elenodes.forEach(function(d) {
     if (Object.keys(d).indexOf("links")!=-1)
-    { 
+    {
         if (d.links.successor) d.links.successor.forEach(function(i) {
           conns.push({source: map[d.name], target: map[i],"type":"successor"});
         });
@@ -280,6 +305,7 @@ function connections(elenodes) {
   });
   return conns;
 }
+
 
 
 function setText(d)
@@ -299,13 +325,13 @@ function setText(d)
     textele = textele.replace("$nodename",circle["node_name"]);
     textele = textele.replace("$ui",circle["uid"]);
     textele = textele.replace("$ipopip",circle["ip4"]);
-    textele = textele.replace("$phyip",circle["PHY_IP"]);
+    textele = textele.replace("$phyip",circle["GeoIP"]);
     uptime = uptime + temptime.toString();
     textele = textele.replace("$starttime",uptime);
     textele = textele.replace("$successor",countById(element,"successor"));
     textele = textele.replace("$ondemand",countById(element,"on_demand"));
     textele = textele.replace("$chord",countById(element,"chord"));
-    
+
 
     textele = textele.replace("$state",state);
     textele = textele.replace("$receivecount",circle["receivecount"]);
@@ -379,9 +405,8 @@ function setModalText(d,type)
   for (obj in circle["macuidmapping"])
   {
     var i;
-    for (i=0;i<node[0].length-1;i++)
+    for (i=0;i<node[0].length;i++)
     {
-      console.log(i);
       if (obj == node[0][i]["__data__"]["key"])
         macuidmappingstr = macuidmappingstr+ "<tr><td>"+node[0][i]["__data__"]["node_name"]+"</td><td>"+obj+"</td><td>"+circle["macuidmapping"][obj].join()+"</td></tr>";
     }
@@ -395,13 +420,13 @@ function setModalText(d,type)
     modalele = modalele.replace("$nodename",circle["node_name"]);
     modalele = modalele.replace("$ui",circle["uid"]);
     modalele = modalele.replace("$ipopip",circle["ip4"]);
-    modalele = modalele.replace("$phyip",circle["PHY_IP"]);
+    modalele = modalele.replace("$phyip",circle["GeoIP"]);
     uptime = uptime + temptime.toString();
     modalele = modalele.replace("$starttime",uptime);
     modalele = modalele.replace("$successor",countById(element,"successor"));
     modalele = modalele.replace("$ondemand",countById(element,"on_demand"));
     modalele = modalele.replace("$chord",countById(element,"chord"));
-    
+
 
     modalele = modalele.replace("$state",state);
     modalele = modalele.replace("$receivecount",circle["receivecount"]);
@@ -427,4 +452,111 @@ function closemodal(event)
     var node_id = event.target.parentNode.id;
     var element = node_id.substring(0,node_id.indexOf("_modal_content"));
     document.getElementById(element+"_modal").style.display = "none";
+}
+
+
+function buildmanagednodetopology(nodedatas, eleuid)
+{
+    var innerRadiusManagedTopology = innerRadius-150;
+    var managednodecluster = d3.layout.cluster()
+    .size([360, innerRadiusManagedTopology])
+    .sort(null)
+    .value(function(d) { return d.size; });
+
+    if (nodedatas["response"].length == 0)
+        return;
+
+    var managednodes = managednodecluster.nodes(packageHierarchy(nodedatas["response"]));
+    var managedlinks = connections(managednodes);
+
+    var managednode_svg = d3.select("#managednode_topology_"+eleuid+"_modal").append("svg")
+        .attr("width", diameter)
+        .attr("height", diameter)
+        .append("g")
+        .attr("transform", "translate(" + radius + "," + radius + ")");
+
+    var managedlink  = managednode_svg.selectAll(".link").data(bundle(managedlinks));
+    managedlink.enter().append("path")
+        .each(function(d) {
+        d.source = d[0], d.target = d[d.length - 1]})
+        .attr("class", "link")
+        .attr("style", "display=block;")
+        .attr("d", line)
+        .attr("stroke","grey");
+
+    var managednode = managednode_svg.selectAll(".node").data(managednodes.filter(function(n) { return !n.children; }));
+    var managednodetext = managednode_svg.selectAll(".node").data(managednodes.filter(function(n) { return !n.children; }));
+
+    managednode.enter().append("circle")
+          .attr("class", "node")
+          .attr("fill", "green")
+          .attr("dy", ".31em")
+            .attr("r", "10")
+          .attr("transform", function(d) {
+            return "rotate(" + (d.x - 90) + ")translate(" + (d.y + 8) + ",0)" + (d.x < 180 ? "" : "rotate(180)"); })
+          .style("text-anchor", function(d) { return d.x < 180 ? "start" : "end"; });
+
+    managednodetext.enter().append("text")
+      .attr("fill", "black")
+      .attr("dy", ".31em")
+      .attr("transform", function(d) { return "rotate(" + (d.x - 90) + ")translate(" + (d.y + 28) + ",0)" + (d.x < 180 ? "" : "rotate(180)"); })
+      .style("text-anchor", function(d) { return d.x < 180 ? "start" : "end"; })
+      .text(function(d) { return d.name; });
+
+    managednodetext.exit().remove();
+    managedlink.exit().remove();
+    managednode.exit().remove();
+
+    document.getElementById(eleuid+"_modal_table_content").style.display = "none";
+    document.getElementById(eleuid+"_modal_back").style.display = "block";
+    document.getElementById(eleuid+"_modal_getunmanagednodes").style.display = "none";
+}
+
+
+function getunmanagednodes(event)
+{
+    var node_id = event.target.parentNode.id;
+    var nodeuid = node_id.substring(0,node_id.indexOf("_modal_content"));
+    var node_topology = document.getElementById("managednode_topology_"+nodeuid+"_modal");
+
+    if (node_topology.style.display == "")
+    {
+        $.ajax({
+            type: "GET",
+            method: "GET",
+            url: "http://"+serverip+":8080/getunmanagednodedetails",
+            contentType: "application/text",
+            datatype:"text",
+            data: nodeuid,
+            crossDomain:true,
+            timeout : 5000,
+            success : function(unmanagedtopology)
+            {
+              buildmanagednodetopology(unmanagedtopology, nodeuid);
+
+            },
+            error: function(errordata)
+            {
+              alert("IPOP Webservice is down!! Please check after sometime..");
+              console.log(errordata);
+            }
+        });
+    }
+    else
+    {
+        node_topology.style.display ="block";
+        document.getElementById(nodeuid+"_modal_table_content").style.display = "none";
+        document.getElementById(nodeuid+"_modal_back").style.display = "block";
+        document.getElementById(nodeuid+"_modal_getunmanagednodes").style.display = "none";
+    }
+}
+
+function back(event)
+{
+    var node_id = event.target.parentNode.id;
+    var nodeuid = node_id.substring(0,node_id.indexOf("_modal_content"))
+    document.getElementById(nodeuid+"_modal_table_content").style.display = "block";
+    document.getElementById(nodeuid+"_modal_getunmanagednodes").style.display = "block";
+    document.getElementById(nodeuid+"_modal_back").style.display = "none";
+    document.getElementById("managednode_topology_"+nodeuid+"_modal").style.display = "none";
 }

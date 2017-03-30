@@ -10,11 +10,15 @@ app = Flask(__name__)
 app.secret_key = 'IPOP UI'
 CORS(app)
 
+
+
 #Initializing Global variables
 global nodeData,isLocked,lock
 nodeData = {}
 isLocked = False
 lock = Lock()
+stopnodelist = []
+unmanaged_node_table = {}
 
 timeout = 15
 log = logging.getLogger('werkzeug')
@@ -26,36 +30,41 @@ starttimedetails = {}
 @app.route('/insertdata',methods=['GET', 'POST'])
 @cross_origin()
 def listener():
-	lock.acquire()
-	isLocked = True
-	msg = request.json
-	uid = msg["uid"]
-	if uid not in nodeData.keys():
-		starttimedetails.update({uid:msg["uptime"]})	
-	nodeData[uid] = msg
-	lock.release()
-	isLocked = False
-	return "200"
+    try:
+        lock.acquire()
+        isLocked = True
+        msg = request.json
+        uid = msg["uid"]
+        if uid not in nodeData.keys():
+            starttimedetails.update({uid:msg["uptime"]})
+        nodeData[uid] = msg
+        nodeData[uid]["lastupdatetime"] = int(time.time())
+        unmanaged_node_table.update({uid : nodeData[uid]['unmanagednodelist']})
+        lock.release()
+    except:
+        lock.release()
+    isLocked = False
+    return "200"
 
 #Displays the IPOP Homepage
 @app.route('/IPOP')
 @cross_origin()
 def homepage():
-    resp =  render_template('D3U.html')
+    resp =  render_template('ipop_mainpage.html')
     return resp
 
 #Displays page for Sub-Graph
 @app.route('/subgraphtemplate')
 @cross_origin()
 def getGraphTemplate():
-    resp =  render_template('ipopsubgraphui.html')
+    resp =  render_template('ipop_subgraphdetails.html')
     return resp
 
 #Displays page for Node details via URL
 @app.route('/subgraphdetailstemplate')
 @cross_origin()
 def getGraphDetailsTemplate():
-    resp =  render_template('ipopsubgraph_ui.html')
+    resp =  render_template('ipop_nodedetails.html')
     return resp
 
 # Sets node adjacency list
@@ -80,11 +89,14 @@ def setNodeData(nodeName,nodelist,runningnodelist):
 def getNodeStatus():
     stoppedNodes,runningNodes = [],[]
     for key,value in nodeData.items():
-        if int(time.time())-value["uptime"] > timeout:
-            value["state"] = "stopped"
+        if int(time.time())- value["lastupdatetime"] > timeout:
+            value["state"] == "stopped"
             stoppedNodes.append(str(key+" - "+value["node_name"]))
         else:
             runningNodes.append(key)
+            nodedetail = str(key+" - "+value["node_name"])
+            if nodedetail in stopnodelist:
+                stopnodelist.remove(nodedetail)
     return stoppedNodes,runningNodes
 
 # Gets the node details for Sub-Graph functionality
@@ -110,14 +122,8 @@ def getNodeDetails(nodelist):
 
 # Function to set Server IP Address in the Javascript file
 def replace(substr,ip):
-    filedescrp = open("./static/js/d3_ipop.js","r+")
+    filedescrp = open("./static/js/ipop_common.js","r+")
     data = filedescrp.read().replace(substr,ip)
-    filedescrp.seek(0)
-    filedescrp.write(data)
-    filedescrp.truncate()
-    filedescrp.close()
-    filedescrp = open("./static/js/d3_ipop_subgraph.js", "r+")
-    data = filedescrp.read().replace(substr, ip)
     filedescrp.seek(0)
     filedescrp.write(data)
     filedescrp.truncate()
@@ -150,6 +156,7 @@ def getURIGraph():
     try:
         lock.acquire()
         outputdata = getNodeDetails(nodelist)
+        lock.release()
     except Exception as err:
         lock.release()
         logging.error("Exception in Sub graph node details:"+str(err))
@@ -178,7 +185,7 @@ def nodedata():
         responseMsg = {
             "response": {
                             "runningnodes": nodeDetailsList,
-                            "stoppednodes": stoppedNodes
+                            "stoppednodes": stopnodelist
                         }
             }
         lock.release()
@@ -190,6 +197,38 @@ def nodedata():
         logging.info("Exception occured in nodedata function.")
         logging.error("Exception::"+str(err))
 
+# Main Visualizer webservice
+@app.route('/getunmanagednodedetails', methods=['GET', 'POST'])
+@cross_origin()
+def getunmanagednodedetails():
+    nodeuid = request.query_string
+    responseMsg = {
+        "response": []
+    }
+    nodelist = []
+    if nodeuid in unmanaged_node_table.keys():
+        unmanagednodes = unmanaged_node_table[nodeuid]
+	localip        = nodeData[nodeuid]['ip4']
+        nodedetails = {
+            "name": localip,
+            "links": {
+                "successor": unmanagednodes
+            }
+        }
+        nodelist.append(nodedetails)
+        for node in unmanagednodes:
+            nodedetails = {
+                "name"   : node,
+                "links" : {
+                    "successor" : [localip]
+                }
+            }
+            nodelist.append(nodedetails)
+
+        responseMsg["response"] = nodelist
+    resp = make_response(json.dumps(responseMsg))
+    resp.headers['Content-Type'] = "application/json"
+    return resp
 
 def main(ipv4):
     app.run(host=ipv4,port=8080,threaded=True)                             # Start the IPOP webserver
@@ -198,13 +237,13 @@ def cleanNodeDetails():
     while True:
         time.sleep(45)
         try:
-            log.info("Node cleaning started")
             lock.acquire()
             stoppedNodes, runningnodes = getNodeStatus()
             for nodeele in stoppedNodes:
                 nodeuid,nodename = nodeele.split(" - ")
                 if nodeuid in nodeData.keys():
                     del nodeData[nodeuid]
+                    stopnodelist.append(nodeele)
             lock.release()
         except Exception as err:
             lock.release()
@@ -230,7 +269,7 @@ if __name__ == "__main__":
     try:
         main(ipv4)
     except Exception as err:
-        log.error("Exception::"+str(err.message))
+        #log.error("Exception::"+str(err.message))
         # Function call to revert all changes done to Javascript file
         replace(ipv4,"$server_ip_address")
     finally:

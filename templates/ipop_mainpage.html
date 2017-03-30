@@ -17,9 +17,9 @@
       <div class="row col-md-12">
         <div class="col-md-2" id="network" style="margin-left: 20px;">
             <div class="row">
-                Use the below drop down to select the Link Type
+                Use below drop down to select Link Type
             </div>
-            <div class="dropdown row" style="padding-right:0px;padding-left: 55px;">
+            <div class="dropdown row" style="padding-right:0px;padding-left: 65px;">
               <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">
                  Link Type
                  <span class="caret"></span>
@@ -31,16 +31,20 @@
                  <li><a href="#">All</a></li>
               </ul>
             </div>
+            <div class="row"> Click on the Nodes(not more than 10) </div>
             <div class="row">
-                <div id="text1">Click on the Nodes(not more than 10)</div>
-                <input type="button" id="getgraphstate" onclick="getsubgraph(event)" value="Get SubGraph" class="btn btn-default" style="margin:auto;background-color:grey;">
                 <input type="text" id="nodedisplaytext" readonly>
-                <input type="button" id="resetgraphstate" onclick="resetgraph(event)" value="Submit" class="btn btn-default" style="display:none;margin:auto;background-color: grey;">
+            </div>
+            <div class="row" style="padding-right:0px;padding-left: 55px;">
+                <input type="button" id="getgraphstate" onclick="getsubgraph(event)" value="Get SubGraph" class="btn btn-default" style="background-color:grey;">
+            </div>
+            <div class="row" style="padding-right:0px;padding-left: 75px;">
+                <input type="button" id="resetgraphstate" onclick="resetgraph(event)" value="Submit" class="btn btn-default" style="display:none;background-color: grey;">
             </div>
             <div class="row">
-              <div id="text1">Click the dropdown menu below for Stopped Nodes</div>
+              <div id="dropdownlist">Click the dropdown menu below for Stopped Nodes</div>
             </div>
-            <div class="dropdown row" style="padding-right:0px;padding-left: 55px;">
+            <div class="dropdown row" style="padding-right:0px;padding-left: 45px;">
               <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">
                  Stopped Nodes
                  <span class="caret"></span>
@@ -73,5 +77,6 @@
       </div>
   </div>
 </body>
-<script type="text/javascript" src="{{ url_for('static',filename='js/d3_ipop.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static',filename='js/ipop_common.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static',filename='js/ipop_mainpage.js') }}"></script>
 </html>
