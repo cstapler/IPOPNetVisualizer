@@ -10,15 +10,12 @@ app = Flask(__name__)
 app.secret_key = 'IPOP UI'
 CORS(app)
 
-
-
 #Initializing Global variables
 global nodeData,isLocked,lock
 nodeData = {}
 isLocked = False
 lock = Lock()
 stopnodelist = []
-unmanaged_node_table = {}
 
 timeout = 15
 log = logging.getLogger('werkzeug')
@@ -39,7 +36,6 @@ def listener():
             starttimedetails.update({uid:msg["uptime"]})
         nodeData[uid] = msg
         nodeData[uid]["lastupdatetime"] = int(time.time())
-        unmanaged_node_table.update({uid : nodeData[uid]['unmanagednodelist']})
         lock.release()
     except:
         lock.release()
@@ -120,16 +116,6 @@ def getNodeDetails(nodelist):
                 outputdata.append(adjeledata)
     return outputdata
 
-# Function to set Server IP Address in the Javascript file
-def replace(substr,ip):
-    filedescrp = open("./static/js/ipop_common.js","r+")
-    data = filedescrp.read().replace(substr,ip)
-    filedescrp.seek(0)
-    filedescrp.write(data)
-    filedescrp.truncate()
-    filedescrp.close()
-
-
 # Sub-Graph Webservice functionality
 @app.route('/subgraph', methods=['GET', 'POST'])
 @cross_origin()
@@ -197,39 +183,6 @@ def nodedata():
         logging.info("Exception occured in nodedata function.")
         logging.error("Exception::"+str(err))
 
-# Main Visualizer webservice
-@app.route('/getunmanagednodedetails', methods=['GET', 'POST'])
-@cross_origin()
-def getunmanagednodedetails():
-    nodeuid = request.query_string
-    responseMsg = {
-        "response": []
-    }
-    nodelist = []
-    if nodeuid in unmanaged_node_table.keys():
-        unmanagednodes = unmanaged_node_table[nodeuid]
-	localip        = nodeData[nodeuid]['ip4']
-        nodedetails = {
-            "name": localip,
-            "links": {
-                "successor": unmanagednodes
-            }
-        }
-        nodelist.append(nodedetails)
-        for node in unmanagednodes:
-            nodedetails = {
-                "name"   : node,
-                "links" : {
-                    "successor" : [localip]
-                }
-            }
-            nodelist.append(nodedetails)
-
-        responseMsg["response"] = nodelist
-    resp = make_response(json.dumps(responseMsg))
-    resp.headers['Content-Type'] = "application/json"
-    return resp
-
 def main(ipv4):
     app.run(host=ipv4,port=8080,threaded=True)                             # Start the IPOP webserver
 
@@ -257,20 +210,8 @@ if __name__ == "__main__":
     if len(sys.argv)>1:
         ipv4 = sys.argv[1]
     else:
-        print("Server IP details required!!")
-        print("Enter Server IP::")
-        if py_ver == 2:
-            ipv4 = str(raw_input())
-        else:
-            ipv4 = str(input())
-
-    # Function call to set IPV4 Address of the IPOPWebserver
-    replace("$server_ip_address",ipv4)
+        ipv4 = '0.0.0.0'
     try:
         main(ipv4)
     except Exception as err:
-        #log.error("Exception::"+str(err.message))
-        # Function call to revert all changes done to Javascript file
-        replace(ipv4,"$server_ip_address")
-    finally:
-        replace(ipv4, "$server_ip_address")
+        log.error("Exception::"+str(err.message))

@@ -3,7 +3,7 @@ window.onload = function() {
         callWebservice();
     }
 
-var serverip = "172.16.110.182";
+var serverip = location.host;
 
 function callWebservice()
 {
@@ -11,7 +11,7 @@ function callWebservice()
   $.ajax({
             type: "GET",
             method: "GET",
-            url: "http://"+serverip+":8080/subgraph",
+            url: "http://"+serverip+"/subgraph",
             contentType: "application/text",
             datatype:"text",
             data: subgraphNodeDetails,

@@ -2,7 +2,7 @@ var texttemplate = "<div id='text_element' class='textbox'><p><div class='headin
 
 var modaltemplate = "<div id='myModal' class='modal'><div id='myModal_content'class='modal-content'><span class='close' onclick='closemodal(event);'>x</span><div id='myModal_table_content' style='display:block;'><table id='NodeDetails'><col style='width:30%'><col style='width:70%'><tr><td class='keyclass'>UID</td><td class='valueclass'>$ui</td></tr><tr><td class='keyclass'>Node Name</td><td class='valueclass'>$nodename</td></tr><tr><td class='keyclass'>IPOP IP</td><td class='valueclass'>$ipopip</td></tr><tr><td class='keyclass'>Geo IP</td><td class='valueclass'>$phyip</td></tr><tr><td class='keyclass'>State</td><td class='valueclass' id='myModal_state'>$state</td></tr><tr><td class='keyclass'>StartTime</td><td class='valueclass' id='text_element_starttime'>$starttime</td></tr></table><p><H3>Link Details</H3></p><table id='Link_Details'><tr><td class='keyclass'>Chord</td><td class='valueclass' id='myModal_chord'>$chord</td></tr><tr><td class='keyclass'>Successor</td><td class='valueclass' id='myModal_successor'>$successor</td></tr><tr><td class='keyclass'>Ondemand</td><td class='valueclass' id='myModal_ondemand'>$ondemand</td></tr></table><p><H3>Message Details</H3></p><table id='MessageDetails'><tr><td class='keyclass'>SendCount</td><td class='valueclass' id='myModal_sendcount'>$sendcount</td></tr><tr><td class='keyclass'>ReceiveCount</td><td class='valueclass' id='myModal_receivecount'>$receivecount</td></tr></table>$MACUIDMAP</div><div id='managednode_topology_myModal' class='topology'></div><input type='button' id='myModal_getunmanagednodes' onclick='getunmanagednodes(event);' value='Switch Topology' class='btn btn-default' style='background-color:grey;'><input type='button' id='myModal_back' onclick='back(event);' value='Back' class='btn btn-default' style='background-color:grey;display:none;' align='right'></div></div>";
 
-var serverip = "$server_ip_address";
+var serverip = location.host;
 
 // Flag to enable/disable subgraph node selection
 var disableoldclick = false;
@@ -521,26 +521,23 @@ function getunmanagednodes(event)
 
     if (node_topology.style.display == "")
     {
-        $.ajax({
-            type: "GET",
-            method: "GET",
-            url: "http://"+serverip+":8080/getunmanagednodedetails",
-            contentType: "application/text",
-            datatype:"text",
-            data: nodeuid,
-            crossDomain:true,
-            timeout : 5000,
-            success : function(unmanagedtopology)
-            {
-              buildmanagednodetopology(unmanagedtopology, nodeuid);
-
-            },
-            error: function(errordata)
-            {
-              alert("IPOP Webservice is down!! Please check after sometime..");
-              console.log(errordata);
+        // nodedetaillist contains current state. transform to switch topology
+        var switchnode = {"links":{}}
+        nodedetaillist.forEach(function(ndunman) {
+            if(ndunman["uid"] == nodeuid) {
+                switchnode["name"] = ndunman["ip4"];
+                switchnode["links"]["successor"] = ndunman["unmanagednodelist"];
+                return;
             }
         });
+        if(switchnode["name"].length > 0) {
+            linknodes = [];
+            switchnode["links"]["successor"].forEach(function(unmanlinknode) {
+                linknodes.push({"name":unmanlinknode, "links":{"successor":[switchnode["name"]]}});
+            });
+            linknodes.push(switchnode);
+            buildmanagednodetopology({"response":linknodes}, nodeuid);
+        }
     }
     else
     {

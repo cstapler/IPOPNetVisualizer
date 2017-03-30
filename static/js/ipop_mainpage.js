@@ -6,13 +6,16 @@ window.onload = function() {
 // Variables to store subgraph node UID and name
 var subgraphNodeDetails = [], subgraphNodeNameDetails = [];
 
+// Variable to store retrieved state of nodes (either current or history)
+var nodedetaillist = [];
+
 // Invokes nodedata webservice and builds the network topology
 function callWebservice(){
 
-d3.json("http://"+serverip+":8080/nodedata", function(error, data) {
+d3.json("http://"+serverip+"/nodedata", function(error, data) {
   if (error) throw error;
 
-  var nodedetaillist = data["response"]["runningnodes"];
+  nodedetaillist = data["response"]["runningnodes"];
 
   // Get initial length of nodedetails (required for reload of page)
   if (lenofdata==0) lenofdata = nodedetaillist.length;
@@ -75,7 +78,7 @@ function resetgraph(event)
   document.getElementById("resetgraphstate").style.display = "none";
   document.getElementById("nodedisplaytext").style.display = "none";
   document.getElementById("getgraphstate").style.display = "block";
-  window.open("http://"+serverip+":8080/subgraphtemplate", "SubGraph"+subgraphcount, "width=500,height=500");
+  window.open("http://"+serverip+"/subgraphtemplate", "SubGraph"+subgraphcount, "width=500,height=500");
   //window.open("http://"+serverip+":8080/subgraphdetails?"+subgraphNodeDetails.toString(), "SubGraph"+subgraphcount, "width=500,height=500");
   subgraphcount+=1;
   subgraphNodeDetails.length=0;
