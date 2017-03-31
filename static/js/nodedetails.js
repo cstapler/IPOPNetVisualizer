@@ -1,8 +1,9 @@
+var nodedetaillist;
 function makePage(data,state) {
-  var classes = JSON.parse(data);
+  nodedetaillist = JSON.parse(data);
   if (lenofdata==0)
-    lenofdata = classes.length;
-  buildnetworktopology(classes);
+    lenofdata = nodedetaillist.length;
+  buildnetworktopology(nodedetaillist);
 }
 
 

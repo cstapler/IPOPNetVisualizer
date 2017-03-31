@@ -1,6 +1,6 @@
-var texttemplate = "<div id='text_element' class='textbox'><p><div class='heading'>General Details</div></p><table id='NodeDetails'><tr><td class='keyclass'>UID</td><td class='valueclass'>$ui</td></tr><tr><td class='keyclass'>Node Name</td><td class='valueclass'>$nodename</td></tr><tr><td class='keyclass'>IPOP IP</td><td class='valueclass'>$ipopip</td></tr><tr><td class='keyclass'>GEO IP</td><td class='valueclass'>$phyip</td></tr><tr><td class='keyclass'>State</td><td class='valueclass' id='text_element_state'>$state</td></tr><tr><td class='keyclass'>StartTime</td><td class='valueclass' id='text_element_starttime'>$starttime</td></tr></table><p><div class='heading'>Link Details</div></p><table id='Link_Details'><tr><td class='keyclass'>Chord</td><td class='valueclass' id='text_element_chord'>$chord</td></tr><tr><td class='keyclass'>Successor</td><td class='valueclass' id='text_element_successor'>$successor</td></tr><tr><td class='keyclass'>Ondemand</td><td class='valueclass' id='text_element_ondemand'>$ondemand</td></tr></table><p><div class='heading'>Message Details</div></p><table id='MessageDetails'><tr><td class='keyclass'>SendCount</td><td class='valueclass' id='text_element_sendcount'>$sendcount</td></tr><tr><td class='keyclass'>ReceiveCount</td><td class='valueclass' id='text_element_receivecount'>$receivecount</td></tr></table></div></div>";
+var texttemplate = "<div id='text_element' class='textbox'><p><div class='heading'>General Details</div></p><table id='NodeDetails'><tr><td class='keyclass'>UID</td><td class='valueclass'>$ui</td></tr><tr><td class='keyclass'>Node Name</td><td class='valueclass'>$nodename</td></tr><tr><td class='keyclass'>IPOP IP</td><td class='valueclass'>$ipopip</td></tr><tr><td class='keyclass'>GEO IP</td><td class='valueclass'>$phyip</td></tr><tr><td class='keyclass'>State</td><td class='valueclass' id='text_element_state'>$state</td></tr><tr><td class='keyclass'>StartTime</td><td class='valueclass' id='text_element_starttime'>$starttime</td></tr><tr><td class='keyclass'>Location</td><td class='valueclass' id='text_element_location'>$location</td></tr></table><p><div class='heading'>Link Details</div></p><table id='Link_Details'><tr><td class='keyclass'>Chord</td><td class='valueclass' id='text_element_chord'>$chord</td></tr><tr><td class='keyclass'>Successor</td><td class='valueclass' id='text_element_successor'>$successor</td></tr><tr><td class='keyclass'>Ondemand</td><td class='valueclass' id='text_element_ondemand'>$ondemand</td></tr></table></div></div>";
 
-var modaltemplate = "<div id='myModal' class='modal'><div id='myModal_content'class='modal-content'><span class='close' onclick='closemodal(event);'>x</span><div id='myModal_table_content' style='display:block;'><table id='NodeDetails'><col style='width:30%'><col style='width:70%'><tr><td class='keyclass'>UID</td><td class='valueclass'>$ui</td></tr><tr><td class='keyclass'>Node Name</td><td class='valueclass'>$nodename</td></tr><tr><td class='keyclass'>IPOP IP</td><td class='valueclass'>$ipopip</td></tr><tr><td class='keyclass'>Geo IP</td><td class='valueclass'>$phyip</td></tr><tr><td class='keyclass'>State</td><td class='valueclass' id='myModal_state'>$state</td></tr><tr><td class='keyclass'>StartTime</td><td class='valueclass' id='text_element_starttime'>$starttime</td></tr></table><p><H3>Link Details</H3></p><table id='Link_Details'><tr><td class='keyclass'>Chord</td><td class='valueclass' id='myModal_chord'>$chord</td></tr><tr><td class='keyclass'>Successor</td><td class='valueclass' id='myModal_successor'>$successor</td></tr><tr><td class='keyclass'>Ondemand</td><td class='valueclass' id='myModal_ondemand'>$ondemand</td></tr></table><p><H3>Message Details</H3></p><table id='MessageDetails'><tr><td class='keyclass'>SendCount</td><td class='valueclass' id='myModal_sendcount'>$sendcount</td></tr><tr><td class='keyclass'>ReceiveCount</td><td class='valueclass' id='myModal_receivecount'>$receivecount</td></tr></table>$MACUIDMAP</div><div id='managednode_topology_myModal' class='topology'></div><input type='button' id='myModal_getunmanagednodes' onclick='getunmanagednodes(event);' value='Switch Topology' class='btn btn-default' style='background-color:grey;'><input type='button' id='myModal_back' onclick='back(event);' value='Back' class='btn btn-default' style='background-color:grey;display:none;' align='right'></div></div>";
+var modaltemplate = "<div id='myModal' class='modal'><div id='myModal_content'class='modal-content'><span class='close' onclick='closemodal(event);'>x</span><div id='myModal_table_content' style='display:block;'><table id='NodeDetails'><col style='width:30%'><col style='width:70%'><tr><td class='keyclass'>UID</td><td class='valueclass'>$ui</td></tr><tr><td class='keyclass'>Node Name</td><td class='valueclass'>$nodename</td></tr><tr><td class='keyclass'>IPOP IP</td><td class='valueclass'>$ipopip</td></tr><tr><td class='keyclass'>Geo IP</td><td class='valueclass'>$phyip</td></tr><tr><td class='keyclass'>State</td><td class='valueclass' id='myModal_state'>$state</td></tr><tr><td class='keyclass'>StartTime</td><td class='valueclass' id='text_element_starttime'>$starttime</td></tr><tr><td class='keyclass'>Location</td><td class='valueclass' id='text_element_location'>$location</td></tr></table><p><H3>Link Details</H3></p><table id='Link_Details'><tr><td class='keyclass'>Chord</td><td class='valueclass' id='myModal_chord'>$chord</td></tr><tr><td class='keyclass'>Successor</td><td class='valueclass' id='myModal_successor'>$successor</td></tr><tr><td class='keyclass'>Ondemand</td><td class='valueclass' id='myModal_ondemand'>$ondemand</td></tr></table>$MACUIDMAP</div><div id='managednode_topology_myModal' class='topology'></div><input type='button' id='myModal_getunmanagednodes' onclick='getunmanagednodes(event);' value='Switch Topology' class='btn btn-default' style='background-color:grey;'><input type='button' id='myModal_back' onclick='back(event);' value='Back' class='btn btn-default' style='background-color:grey;display:none;' align='right'></div></div>";
 
 var serverip = location.host;
 
@@ -331,11 +331,11 @@ function setText(d)
     textele = textele.replace("$successor",countById(element,"successor"));
     textele = textele.replace("$ondemand",countById(element,"on_demand"));
     textele = textele.replace("$chord",countById(element,"chord"));
-
-
+    var location="";
+    if (circle["GeoIP"] != " " && Object.keys(circle).indexOf("location")!=-1)
+        location = circle["location"]["city"]+", "+circle["location"]["region"]+", "+circle["location"]["country"];
     textele = textele.replace("$state",state);
-    textele = textele.replace("$receivecount",circle["receivecount"]);
-    textele = textele.replace("$sendcount",circle["sendcount"]);
+    textele = textele.replace("$location",location);
     $("#NodeDetails").append(textele);
   }
   else
@@ -343,8 +343,6 @@ function setText(d)
     document.getElementById("text_"+element+"_successor").innerHTML   = countById(element,"successor");
     document.getElementById("text_"+element+"_ondemand").innerHTML  = countById(element,"on_demand");
     document.getElementById("text_"+element+"_chord").innerHTML     = countById(element,"chord");
-    document.getElementById("text_"+element+"_sendcount").innerHTML   = circle["sendcount"];
-    document.getElementById("text_"+element+"_receivecount").innerHTML= circle["receivecount"];
     document.getElementById("text_"+element+"_state").innerHTML     = state;
     document.getElementById("text_"+element).style.display = "block";
   }
@@ -408,7 +406,7 @@ function setModalText(d,type)
     for (i=0;i<node[0].length;i++)
     {
       if (obj == node[0][i]["__data__"]["key"])
-        macuidmappingstr = macuidmappingstr+ "<tr><td>"+node[0][i]["__data__"]["node_name"]+"</td><td>"+obj+"</td><td>"+circle["macuidmapping"][obj].join()+"</td></tr>";
+        macuidmappingstr = macuidmappingstr+ "<tr><td>"+node[0][i]["__data__"]["node_name"]+"</td><td>"+obj.substring(0,10)+"</td><td>"+circle["macuidmapping"][obj].join()+"</td></tr>";
     }
   }
   macuidmappingstr = macuidmappingstr+"</table></p>"
@@ -422,15 +420,15 @@ function setModalText(d,type)
     modalele = modalele.replace("$ipopip",circle["ip4"]);
     modalele = modalele.replace("$phyip",circle["GeoIP"]);
     uptime = uptime + temptime.toString();
+    var location="";
+    if (circle["GeoIP"] != " " && Object.keys(circle).indexOf("location")!=-1)
+        location = circle["location"]["city"]+", "+circle["location"]["region"]+", "+circle["location"]["country"];
     modalele = modalele.replace("$starttime",uptime);
+    modalele = modalele.replace("$location",location);
     modalele = modalele.replace("$successor",countById(element,"successor"));
     modalele = modalele.replace("$ondemand",countById(element,"on_demand"));
     modalele = modalele.replace("$chord",countById(element,"chord"));
-
-
     modalele = modalele.replace("$state",state);
-    modalele = modalele.replace("$receivecount",circle["receivecount"]);
-    modalele = modalele.replace("$sendcount",circle["sendcount"]);
     modalele = modalele.replace("$MACUIDMAP",macuidmappingstr);
     return modalele;
   }
@@ -439,8 +437,6 @@ function setModalText(d,type)
     document.getElementById(element+"_modal_successor").innerHTML   = countById(element,"successor");
     document.getElementById(element+"_modal_ondemand").innerHTML  = countById(element,"on_demand");
     document.getElementById(element+"_modal_chord").innerHTML     = countById(element,"chord");
-    document.getElementById(element+"_modal_sendcount").innerHTML   = circle["sendcount"];
-    document.getElementById(element+"_modal_receivecount").innerHTML= circle["receivecount"];
     document.getElementById(element+"_modal_state").innerHTML     = state;
     $('#'+element+"_modal_maccontent").remove();
     $('#'+element+"_modal_maccontent").append(macuidmappingstr);

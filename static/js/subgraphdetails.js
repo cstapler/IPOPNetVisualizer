@@ -4,7 +4,7 @@ window.onload = function() {
     }
 
 var serverip = location.host;
-
+var nodedetaillist;
 function callWebservice()
 {
   subgraphNodeDetails = localStorage.getItem("subgraphelements");
@@ -30,13 +30,13 @@ function callWebservice()
 }
 
 function makePage(data,state) {
-  var nodedetailslist = data["response"];
+  nodedetaillist = data["response"];
   if (lenofdata==0)
-    lenofdata = nodedetailslist.length;
+    lenofdata = nodedetaillist.length;
 
-  buildnetworktopology(nodedetailslist);
+  buildnetworktopology(nodedetaillist);
 
-  if (lenofdata !=nodedetailslist.length)
+  if (lenofdata !=nodedetaillist.length)
       location.reload();
 }
 

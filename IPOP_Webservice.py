@@ -36,6 +36,7 @@ def listener():
             starttimedetails.update({uid:msg["uptime"]})
         nodeData[uid] = msg
         nodeData[uid]["lastupdatetime"] = int(time.time())
+        
         lock.release()
     except:
         lock.release()
