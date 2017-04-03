@@ -1,7 +1,8 @@
 var divhistorytemplate = "<div id='topology_$interval' class='topology'></div>";
-var spanhistorytemplate ="<span class='dot' id='span_$interval' onclick='loadinterval(event,$interval)'></span>";
+var spanhistorytemplate ="<span class='dot' id='span_time_interval' onclick='loadinterval(event,time_interval)' onmouseover='displayinterval(event,time_interval)' onmouseout='displayinterval(event,time_interval)'><div class='intervaldesc' style='display:none;'>$formatinterval</span>";
 var svg_width = 700,svg_height = 550;
 var enableinterval;
+var nodedetaillist = [];
 window.onload = function() {
         callWebservice();
     }
@@ -44,8 +45,8 @@ function buildpage(data)
             $("#topology").append(divid);
             buildnetworktopology(topologyhistory[ival],ival);
             document.getElementById("topology_"+ival).style.display = "none";
-            var spanid = spanhistorytemplate.replace("$interval",ival);
-            spanid = spanid.replace("$interval",ival);
+            var spanid = spanhistorytemplate.replace(/time_interval/g,ival);
+            spanid = spanid.replace("$formatinterval",(new Date(parseInt(ival))).toLocaleTimeString());
             $("#interval").append(spanid);
             $("#svg").remove();
         }
@@ -63,4 +64,12 @@ function loadinterval(event,history_interval)
         document.getElementById("topology_"+enableinterval).style.display = "none";
         enableinterval = history_interval;
     }
+}
+
+function displayinterval(event, intrval)
+{
+    if (event.type == "mouseover")
+        $("#span_"+intrval).children(".intervaldesc").show();
+    else
+        $("#span_"+intrval).children(".intervaldesc").hide();
 }

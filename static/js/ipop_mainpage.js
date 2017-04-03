@@ -116,9 +116,15 @@ function getHistory(event,type)
     {
         var from_hour= document.getElementById("fromhour").value;
         var from_minutes = document.getElementById("fromminutes").value;
+        var from_ampm= document.getElementById("fromduration").value;
+        if (from_ampm=="PM")
+            from_hour = (parseInt(from_hour) + 12).toString();
         var to_hour = document.getElementById("tohour").value;
         var to_minutes = document.getElementById("tominutes").value;
-        console.log(from_hour+":"+from_minutes+":"+to_hour+":"+to_minutes);
+        var to_ampm= document.getElementById("toduration").value;
+        if (to_ampm=="PM")
+            to_hour = (parseInt(to_hour) + 12).toString();
+
         var currenttimestamp = new Date();
         var start_time  = new Date(currenttimestamp.getFullYear(),currenttimestamp.getMonth(),currenttimestamp.getDate(),from_hour,from_minutes,0,0);
         var end_time = new Date(currenttimestamp.getFullYear(),currenttimestamp.getMonth(),currenttimestamp.getDate(),to_hour,to_minutes,0,0);
