@@ -1,13 +1,13 @@
 var texttemplate = "<div id='text_element' class='textbox'><p><div class='heading'>General Details</div></p><table id='NodeDetails'><tr><td class='keyclass'>UID</td><td class='valueclass'>$ui</td></tr><tr><td class='keyclass'>Node Name</td><td class='valueclass'>$nodename</td></tr><tr><td class='keyclass'>IPOP IP</td><td class='valueclass'>$ipopip</td></tr><tr><td class='keyclass'>GEO IP</td><td class='valueclass'>$phyip</td></tr><tr><td class='keyclass'>State</td><td class='valueclass' id='text_element_state'>$state</td></tr><tr><td class='keyclass'>StartTime</td><td class='valueclass' id='text_element_starttime'>$starttime</td></tr><tr><td class='keyclass'>Location</td><td class='valueclass' id='text_element_location'>$location</td></tr></table><p><div class='heading'>Link Details</div></p><table id='Link_Details'><tr><td class='keyclass'>Chord</td><td class='valueclass' id='text_element_chord'>$chord</td></tr><tr><td class='keyclass'>Successor</td><td class='valueclass' id='text_element_successor'>$successor</td></tr><tr><td class='keyclass'>Ondemand</td><td class='valueclass' id='text_element_ondemand'>$ondemand</td></tr></table></div></div>";
 
-var modaltemplate = "<div id='myModal' class='modal'><div id='myModal_content'class='modal-content'><span class='close' onclick='closemodal(event);'>x</span><div id='myModal_table_content' style='display:block;'><table id='NodeDetails'><col style='width:30%'><col style='width:70%'><tr><td class='keyclass'>UID</td><td class='valueclass'>$ui</td></tr><tr><td class='keyclass'>Node Name</td><td class='valueclass'>$nodename</td></tr><tr><td class='keyclass'>IPOP IP</td><td class='valueclass'>$ipopip</td></tr><tr><td class='keyclass'>Geo IP</td><td class='valueclass'>$phyip</td></tr><tr><td class='keyclass'>State</td><td class='valueclass' id='myModal_state'>$state</td></tr><tr><td class='keyclass'>StartTime</td><td class='valueclass' id='text_element_starttime'>$starttime</td></tr><tr><td class='keyclass'>Location</td><td class='valueclass' id='text_element_location'>$location</td></tr></table><p><H3>Link Details</H3></p><table id='Link_Details'><tr><td class='keyclass'>Chord</td><td class='valueclass' id='myModal_chord'>$chord</td></tr><tr><td class='keyclass'>Successor</td><td class='valueclass' id='myModal_successor'>$successor</td></tr><tr><td class='keyclass'>Ondemand</td><td class='valueclass' id='myModal_ondemand'>$ondemand</td></tr></table>$MACUIDMAP</div><div id='managednode_topology_myModal' class='topology'></div><input type='button' id='myModal_getunmanagednodes' onclick='getunmanagednodes(event);' value='Switch Topology' class='btn btn-default' style='background-color:grey;'><input type='button' id='myModal_back' onclick='back(event);' value='Back' class='btn btn-default' style='background-color:grey;display:none;' align='right'></div></div>";
+var modaltemplate = "<div id='myModal' class='modal'><div id='myModal_content'class='modal-content'><span class='close' onclick='closemodal(event);'>x</span><div id='myModal_table_content' style='display:block;'><table id='NodeDetails'><col style='width:30%'><col style='width:70%'><tr><td class='keyclass'>UID</td><td class='valueclass'>$ui</td></tr><tr><td class='keyclass'>Node Name</td><td class='valueclass'>$nodename</td></tr><tr><td class='keyclass'>IPOP IP</td><td class='valueclass'>$ipopip</td></tr><tr><td class='keyclass'>Geo IP</td><td class='valueclass'>$phyip</td></tr><tr><td class='keyclass'>State</td><td class='valueclass' id='myModal_state'>$state</td></tr><tr><td class='keyclass'>StartTime</td><td class='valueclass' id='text_element_starttime'>$starttime</td></tr><tr><td class='keyclass'>Location</td><td class='valueclass' id='text_element_location'>$location</td></tr></table><p><H3>Link Details</H3></p><table id='Link_Details'><tr><td class='keyclass'>Chord</td><td class='valueclass' id='myModal_chord'>$chord</td></tr><tr><td class='keyclass'>Successor</td><td class='valueclass' id='myModal_successor'>$successor</td></tr><tr><td class='keyclass'>Ondemand</td><td class='valueclass' id='myModal_ondemand'>$ondemand</td></tr></table>$MACUIDMAP</div><div id='managednode_topology_myModal' class='unmanagednodetopology'></div><input type='button' id='myModal_getunmanagednodes' onclick='getunmanagednodes(event);' value='Switch Topology' class='btn btn-default' style='background-color:grey;'><input type='button' id='myModal_back' onclick='back(event);' value='Back' class='btn btn-default' style='background-color:grey;display:none;' align='right'></div></div>";
 
 var serverip = location.host;
 
 // Flag to enable/disable subgraph node selection
 var disableoldclick = false;
 
-var diameter = 960,
+var diameter = Math.min(svg_width , svg_height),
     radius = diameter / 2,
     innerRadius = radius - 120;
 
@@ -28,8 +28,9 @@ var line = d3.svg.line.radial()
     .angle(function(d) { return d.x / 180 * Math.PI; });
 
 var svg = d3.select("#topology").append("svg")
-    .attr("width", diameter)
-    .attr("height", diameter)
+    .attr("width", svg_width)
+    .attr("height", svg_height)
+    .attr("id", "svg")
   .append("g")
     .attr("transform", "translate(" + radius + "," + radius + ")");
 
@@ -40,7 +41,18 @@ var nodes;
 
 function buildnetworktopology()
 {
+    var interval;
     var nodelist = arguments[0];
+    if (arguments.length>1)
+    {
+        interval = arguments[1];
+        svg = d3.select("#topology_"+interval).append("svg")
+                .attr("width", svg_width)
+                .attr("height", svg_height)
+                .append("g")
+                .attr("transform", "translate(" + radius + "," + radius + ")");
+
+    }
     nodes = cluster.nodes(packageHierarchy(nodelist)),
       links = connections(nodes);
 

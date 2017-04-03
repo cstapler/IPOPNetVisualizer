@@ -1,4 +1,5 @@
 var subgraphNodeDetails = "";
+var svg_width = 960,svg_height = 960;
 window.onload = function() {
         callWebservice();
     }

@@ -18,10 +18,15 @@ lock = Lock()
 stopnodelist = []
 
 timeout = 15
-log = logging.getLogger('werkzeug')
-log.setLevel(logging.ERROR)
+#log = logging.getLogger('werkzeug')
+#log.setLevel(logging.ERROR)
 
 starttimedetails = {}
+networkdetails = {
+    "10000000" : [{"uid": "062ccaf12f3639af08ac772594d50a2baccd8d02", "links": {"on_demand": [], "chord": [], "successor": ["0a2d302103cd45b978cf53124fa589535acbc738", "122421e94ca49ee41ffe6570d3c4b76d78088aa5"]}, "state": "connected", "GeoIP": " ", "macuidmapping": {"0a2d302103cd45b978cf53124fa589535acbc738": ["F276CCACD478", "00163EEA03AF", "00163E6FE1D7"], "122421e94ca49ee41ffe6570d3c4b76d78088aa5": ["627972E00677"], "062ccaf12f3639af08ac772594d50a2baccd8d02": ["5EDD340BAF35", "00163E30A232"]}, "unmanagednodelist": ["10.82.128.183", "10.82.128.3"], "node_name": "3", "mac": "5EDD340BAF35", "ip4": "10.82.128.35", "timestamp": 1490817481, "receivecount": "", "sendcount": "", "starttime": 1490817364, "name": "062ccaf12f3639af08ac772594d50a2baccd8d02"}, {"uid": "0a2d302103cd45b978cf53124fa589535acbc738", "links": {"on_demand": [], "chord": [], "successor": ["122421e94ca49ee41ffe6570d3c4b76d78088aa5", "062ccaf12f3639af08ac772594d50a2baccd8d02"]}, "state": "connected", "GeoIP": "70.171.32.182", "macuidmapping": {"0a2d302103cd45b978cf53124fa589535acbc738": ["F276CCACD478", "00163EEA03AF", "00163E6FE1D7"], "122421e94ca49ee41ffe6570d3c4b76d78088aa5": ["627972E00677"], "062ccaf12f3639af08ac772594d50a2baccd8d02": ["5EDD340BAF35", "00163E30A232"]}, "unmanagednodelist": ["10.82.128.100", "10.82.128.56"], "node_name": "1", "mac": "F276CCACD478", "location": {"latitude": "29.573099136353", "city": "Gainesville", "region": "FL", "longitude": "-82.407600402832", "country": "United States"}, "ip4": "10.82.128.15", "timestamp": 1490817481, "receivecount": "", "sendcount": "", "starttime": 1490817364, "name": "0a2d302103cd45b978cf53124fa589535acbc738"}, {"uid": "122421e94ca49ee41ffe6570d3c4b76d78088aa5", "links": {"on_demand": [], "chord": [], "successor": ["0a2d302103cd45b978cf53124fa589535acbc738", "062ccaf12f3639af08ac772594d50a2baccd8d02"]}, "state": "connected", "GeoIP": "70.171.32.182", "macuidmapping": {"0a2d302103cd45b978cf53124fa589535acbc738": ["F276CCACD478", "00163EEA03AF", "00163E6FE1D7"], "122421e94ca49ee41ffe6570d3c4b76d78088aa5": ["627972E00677"], "062ccaf12f3639af08ac772594d50a2baccd8d02": ["5EDD340BAF35", "00163E30A232"]}, "unmanagednodelist": [], "node_name": "2", "mac": "627972E00677", "location": {"latitude": "29.573099136353", "city": "Gainesville", "region": "FL", "longitude": "-82.407600402832", "country": "United States"}, "ip4": "10.82.128.25", "timestamp": 1490817481, "receivecount": "", "sendcount": "", "starttime": 1490817364, "name": "122421e94ca49ee41ffe6570d3c4b76d78088aa5"}],
+    "10000001" : [{"uid": "062ccaf12f3639af08ac772594d50a2baccd8d02", "links": {"on_demand": [], "chord": [], "successor": ["0a2d302103cd45b978cf53124fa589535acbc738", "122421e94ca49ee41ffe6570d3c4b76d78088aa5"]}, "state": "connected", "GeoIP": " ", "macuidmapping": {"0a2d302103cd45b978cf53124fa589535acbc738": ["F276CCACD478", "00163EEA03AF", "00163E6FE1D7"], "122421e94ca49ee41ffe6570d3c4b76d78088aa5": ["627972E00677"], "062ccaf12f3639af08ac772594d50a2baccd8d02": ["5EDD340BAF35", "00163E30A232"]}, "unmanagednodelist": ["10.82.128.183", "10.82.128.3"], "node_name": "3", "mac": "5EDD340BAF35", "ip4": "10.82.128.35", "timestamp": 1490817481, "receivecount": "", "sendcount": "", "starttime": 1490817364, "name": "062ccaf12f3639af08ac772594d50a2baccd8d02"}, {"uid": "0a2d302103cd45b978cf53124fa589535acbc738", "links": {"on_demand": [], "chord": [], "successor": ["122421e94ca49ee41ffe6570d3c4b76d78088aa5", "062ccaf12f3639af08ac772594d50a2baccd8d02"]}, "state": "connected", "GeoIP": "70.171.32.182", "macuidmapping": {"0a2d302103cd45b978cf53124fa589535acbc738": ["F276CCACD478", "00163EEA03AF", "00163E6FE1D7"], "122421e94ca49ee41ffe6570d3c4b76d78088aa5": ["627972E00677"], "062ccaf12f3639af08ac772594d50a2baccd8d02": ["5EDD340BAF35", "00163E30A232"]}, "unmanagednodelist": ["10.82.128.100", "10.82.128.56"], "node_name": "1", "mac": "F276CCACD478", "location": {"latitude": "29.573099136353", "city": "Gainesville", "region": "FL", "longitude": "-82.407600402832", "country": "United States"}, "ip4": "10.82.128.15", "timestamp": 1490817481, "receivecount": "", "sendcount": "", "starttime": 1490817364, "name": "0a2d302103cd45b978cf53124fa589535acbc738"}, {"uid": "122421e94ca49ee41ffe6570d3c4b76d78088aa5", "links": {"on_demand": [], "chord": [], "successor": ["0a2d302103cd45b978cf53124fa589535acbc738", "062ccaf12f3639af08ac772594d50a2baccd8d02"]}, "state": "connected", "GeoIP": "70.171.32.182", "macuidmapping": {"0a2d302103cd45b978cf53124fa589535acbc738": ["F276CCACD478", "00163EEA03AF", "00163E6FE1D7"], "122421e94ca49ee41ffe6570d3c4b76d78088aa5": ["627972E00677"], "062ccaf12f3639af08ac772594d50a2baccd8d02": ["5EDD340BAF35", "00163E30A232"]}, "unmanagednodelist": [], "node_name": "2", "mac": "627972E00677", "location": {"latitude": "29.573099136353", "city": "Gainesville", "region": "FL", "longitude": "-82.407600402832", "country": "United States"}, "ip4": "10.82.128.25", "timestamp": 1490817481, "receivecount": "", "sendcount": "", "starttime": 1490817364, "name": "122421e94ca49ee41ffe6570d3c4b76d78088aa5"}],
+    "10000002" : [{"uid": "062ccaf12f3639af08ac772594d50a2baccd8d02", "links": {"on_demand": [], "chord": [], "successor": ["0a2d302103cd45b978cf53124fa589535acbc738", "122421e94ca49ee41ffe6570d3c4b76d78088aa5"]}, "state": "connected", "GeoIP": " ", "macuidmapping": {"0a2d302103cd45b978cf53124fa589535acbc738": ["F276CCACD478", "00163EEA03AF", "00163E6FE1D7"], "122421e94ca49ee41ffe6570d3c4b76d78088aa5": ["627972E00677"], "062ccaf12f3639af08ac772594d50a2baccd8d02": ["5EDD340BAF35", "00163E30A232"]}, "unmanagednodelist": ["10.82.128.183", "10.82.128.3"], "node_name": "3", "mac": "5EDD340BAF35", "ip4": "10.82.128.35", "timestamp": 1490817481, "receivecount": "", "sendcount": "", "starttime": 1490817364, "name": "062ccaf12f3639af08ac772594d50a2baccd8d02"}, {"uid": "0a2d302103cd45b978cf53124fa589535acbc738", "links": {"on_demand": [], "chord": [], "successor": ["122421e94ca49ee41ffe6570d3c4b76d78088aa5", "062ccaf12f3639af08ac772594d50a2baccd8d02"]}, "state": "connected", "GeoIP": "70.171.32.182", "macuidmapping": {"0a2d302103cd45b978cf53124fa589535acbc738": ["F276CCACD478", "00163EEA03AF", "00163E6FE1D7"], "122421e94ca49ee41ffe6570d3c4b76d78088aa5": ["627972E00677"], "062ccaf12f3639af08ac772594d50a2baccd8d02": ["5EDD340BAF35", "00163E30A232"]}, "unmanagednodelist": ["10.82.128.100", "10.82.128.56"], "node_name": "1", "mac": "F276CCACD478", "location": {"latitude": "29.573099136353", "city": "Gainesville", "region": "FL", "longitude": "-82.407600402832", "country": "United States"}, "ip4": "10.82.128.15", "timestamp": 1490817481, "receivecount": "", "sendcount": "", "starttime": 1490817364, "name": "0a2d302103cd45b978cf53124fa589535acbc738"}, {"uid": "122421e94ca49ee41ffe6570d3c4b76d78088aa5", "links": {"on_demand": [], "chord": [], "successor": ["0a2d302103cd45b978cf53124fa589535acbc738", "062ccaf12f3639af08ac772594d50a2baccd8d02"]}, "state": "connected", "GeoIP": "70.171.32.182", "macuidmapping": {"0a2d302103cd45b978cf53124fa589535acbc738": ["F276CCACD478", "00163EEA03AF", "00163E6FE1D7"], "122421e94ca49ee41ffe6570d3c4b76d78088aa5": ["627972E00677"], "062ccaf12f3639af08ac772594d50a2baccd8d02": ["5EDD340BAF35", "00163E30A232"]}, "unmanagednodelist": [], "node_name": "2", "mac": "627972E00677", "location": {"latitude": "29.573099136353", "city": "Gainesville", "region": "FL", "longitude": "-82.407600402832", "country": "United States"}, "ip4": "10.82.128.25", "timestamp": 1490817481, "receivecount": "", "sendcount": "", "starttime": 1490817364, "name": "122421e94ca49ee41ffe6570d3c4b76d78088aa5"}]
+}
 
 # Receives data from IPOP Controllers
 @app.route('/insertdata',methods=['GET', 'POST'])
@@ -36,7 +41,6 @@ def listener():
             starttimedetails.update({uid:msg["uptime"]})
         nodeData[uid] = msg
         nodeData[uid]["lastupdatetime"] = int(time.time())
-        
         lock.release()
     except:
         lock.release()
@@ -153,6 +157,24 @@ def getURIGraph():
     flash(json.dumps(outputdata))
     return redirect(url_for('getGraphDetailsTemplate'))
 
+@app.route('/History/getTopologyHistoryData', methods=['GET', 'POST'])
+@cross_origin()
+def loadHistoryTemplate():
+    starttime = str(request.query_string).split(",")
+    outputdata = networkdetails
+    responseMsg = {"response": outputdata}
+    resp = make_response(json.dumps(responseMsg))
+    resp.headers['Content-Type'] = "application/json"
+    return resp
+
+
+# History webservice functionality for a particular UID
+@app.route('/History/getTopologyHistory', methods=['GET', 'POST'])
+@cross_origin()
+def loadhistory():
+    return render_template('ipop_history.html')
+
+
 # Main Visualizer webservice
 @app.route('/nodedata', methods=['GET', 'POST'])
 @cross_origin()
@@ -215,4 +237,4 @@ if __name__ == "__main__":
     try:
         main(ipv4)
     except Exception as err:
-        log.error("Exception::"+str(err.message))
+        logging.error("Exception::"+str(err.message))

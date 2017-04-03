@@ -2,9 +2,11 @@
 window.onload = function() {
         callWebservice();
     }
-
+var svg_width = 960,svg_height = 960;
 // Variables to store subgraph node UID and name
 var subgraphNodeDetails = [], subgraphNodeNameDetails = [];
+
+var subgraphcount = 0,windowcount =0;
 
 // Variable to store retrieved state of nodes (either current or history)
 var nodedetaillist = [];
@@ -68,8 +70,6 @@ function getsubgraph(event)
   document.getElementById("nodedisplaytext").style.display = "block";
 }
 
-var subgraphcount = 0;
-
 function resetgraph(event)
 {
   disableoldclick = false;
@@ -103,6 +103,64 @@ function setStoppedNodes(nodeList)
            el.parentNode.removeChild(el);
         }
     }
+}
+
+function getHistory(event,type)
+{
+    if (type=="general")
+    {
+        localStorage.setItem("starttime", "0");
+        localStorage.setItem("endtime", Date.now());
+    }
+    else
+    {
+        var from_hour= document.getElementById("fromhour").value;
+        var from_minutes = document.getElementById("fromminutes").value;
+        var to_hour = document.getElementById("tohour").value;
+        var to_minutes = document.getElementById("tominutes").value;
+        console.log(from_hour+":"+from_minutes+":"+to_hour+":"+to_minutes);
+        var currenttimestamp = new Date();
+        var start_time  = new Date(currenttimestamp.getFullYear(),currenttimestamp.getMonth(),currenttimestamp.getDate(),from_hour,from_minutes,0,0);
+        var end_time = new Date(currenttimestamp.getFullYear(),currenttimestamp.getMonth(),currenttimestamp.getDate(),to_hour,to_minutes,0,0);
+        localStorage.setItem("starttime", start_time.getTime());
+        localStorage.setItem("endtime", end_time.getTime());
+    }
+    window.open("http://"+serverip+"/History/getTopologyHistory", "History"+windowcount, "width=1000,height=600");
+    windowcount+=1;
+
+}
+
+function show(event,type)
+{
+    if (document.getElementById(type).style.display == "none")
+    {
+        document.getElementById(type).style.display = "block";
+        event.target.innerHTML = '- ';
+        if (document.getElementById("hour") == null)
+        {
+            $("#history").append("<datalist id='$id'></datalist>".replace("$id","hour"))
+            loadoptions("hour",1,12)
+        }
+        if (document.getElementById("minutes") == null)
+        {
+            $("#history").append("<datalist id='$id'></datalist>".replace("$id","minutes"))
+            loadoptions("minutes",0,59)
+        }
+    }
+    else
+    {
+        document.getElementById(type).style.display = "none";
+        event.target.innerHTML = '+ ';
+    }
+}
+var optionstemplate = "<option>$item</option>"
+function loadoptions(id,minvalue,maxvalue)
+{
+     var i=minvalue;
+     for (;i<=maxvalue;i++)
+     {
+        $("#"+id).append(optionstemplate.replace("$item",i))
+     }
 }
 
 setInterval(callWebservice,7500);
