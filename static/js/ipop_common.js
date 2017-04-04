@@ -98,12 +98,15 @@ function buildnetworktopology()
     dest_name  = d[2].key;
     if (Object.keys(d[0]).indexOf("links")!=-1)
     {
+      var history_interval = "";
+      if (Object.keys(d[0]).indexOf("interval")!=-1)
+          history_interval = d[0]["interval"];
       if (d[0].links.on_demand.indexOf(dest_name)!= -1)
-        return "on_demand_"+d[0].key+"_"+d[2].key;
+        return "on_demand_"+d[0].key+"_"+d[2].key+"_"+history_interval;
       if (d[0].links.successor.indexOf(dest_name)!= -1)
-        return "successor_"+d[0].key+"_"+d[2].key;
+        return "successor_"+d[0].key+"_"+d[2].key+"_"+history_interval;
       if (d[0].links.chord.indexOf(dest_name)!= -1)
-        return "chord_"+d[0].key+"_"+d[2].key;
+        return "chord_"+d[0].key+"_"+d[2].key+"_"+history_interval;
     }
     })
     .on("mouseover", linkmouseover)
@@ -149,16 +152,19 @@ function buildnetworktopology()
 
 function linktype(source_keys,dest_name,ltype,torf,d)
 {
+    var history_interval = "";
+    if (Object.keys(d[0]).indexOf("interval")!=-1)
+          history_interval = d[0]["interval"];
 	if (source_keys.indexOf(ltype) != -1)
 	{
 		if (d[0].links[ltype].indexOf(dest_name)!= -1)
-			d3.selectAll("#"+ltype+"_"+d[0].key+"_"+d[2].key).classed(ltype,torf);
+			d3.selectAll("#"+ltype+"_"+d[0].key+"_"+d[2].key+"_"+history_interval).classed(ltype,torf);
 	}
 }
 
 function linkmouseover(d)
 {
-	dest_name  = d[2].key;
+  dest_name  = d[2].key;
   if (Object.keys(d[0]).indexOf("links")!=-1)
   {
     source_keys = Object.keys(d[0].links);
@@ -170,14 +176,14 @@ function linkmouseover(d)
 
 function linkmouseout(d)
 {
-	dest_name  = d[2].key;
-  if (Object.keys(d[0]).indexOf("links")!=-1)
-  {
-  	source_keys = Object.keys(d[0].links);
-  	linktype(source_keys,dest_name,"on_demand",false,d);
-  	linktype(source_keys,dest_name,"successor",false,d);
-  	linktype(source_keys,dest_name,"chord",false,d);
-  }
+      dest_name  = d[2].key;
+      if (Object.keys(d[0]).indexOf("links")!=-1)
+      {
+        source_keys = Object.keys(d[0].links);
+        linktype(source_keys,dest_name,"on_demand",false,d);
+        linktype(source_keys,dest_name,"successor",false,d);
+        linktype(source_keys,dest_name,"chord",false,d);
+      }
 }
 
 function mouseovered(d) {
@@ -196,7 +202,6 @@ function mouseovered(d) {
         	  linktype(source_keys,dest_name,"on_demand",true,l);
         	  linktype(source_keys,dest_name,"successor",true,l);
         	  linktype(source_keys,dest_name,"chord",true,l);
-        	  //this.parentNode.appendChild(this);
         }
     }
     });
@@ -207,7 +212,11 @@ function mouseovered(d) {
 
 function mouseclick(d)
 {
-  var element = d["name"];
+  var history_interval = "";
+  if (Object.keys(d).indexOf("interval")!=-1)
+      history_interval = d["interval"];
+
+  var element = d["name"]+"_"+history_interval;
 
   if (disableoldclick == false)
   {
@@ -259,7 +268,11 @@ function mouseouted(d) {
       .classed("node--target", false)
       .classed("node--source", false);
 
-  var modalElement = document.getElementById("text_"+d["name"]);
+  var history_interval = "";
+  if (Object.keys(d).indexOf("interval")!=-1)
+      history_interval = d["interval"];
+
+  var modalElement = document.getElementById("text_"+d["name"]+"_"+history_interval);
   modalElement.style.display = "none";
 }
 
@@ -322,10 +335,13 @@ function connections() {
 
 function setText(d)
 {
+  var history_interval = "";
+  if (Object.keys(d).indexOf("interval")!=-1)
+      history_interval = d["interval"];
   var circle  = d;
   var state="";
   var uptime= "";
-  var element = circle["name"];
+  var element = circle["name"]+"_"+history_interval;
   state = state + circle["state"];
   var temptime = circle["starttime"];
   temptime = new Date(temptime*1000);
@@ -362,42 +378,40 @@ function setText(d)
 
 function countById(id,type)
 {
+  var nodeuid = id.split("_")[0],
+      history_interval = id.split("_")[1];
+
+  var pathele = "",i=0;
+  if (history_interval=="")
+      pathele = $("#topology").find("path");
+  else
+      pathele = $("#topology_"+history_interval).find("path");
+  var noOfElements = pathele["length"];
+  pathele = Object.values(pathele)
+
   var count=0;
   var elementconns = [];
 
-  nodes.forEach(function(element,i)
-  {
-    if (Object.keys(element).indexOf("name")!=-1)
-    {
-      if(element["name"]==id)
-        elementconns = element["links"][type];
-    }
-  });
-
-  link[0].forEach(function(element,i)
-  {
-    var element_id = element["id"].split("_");
-    var state = element["style"]["display"];
-    if(id=="*"&&(element_id[0].includes(type)==true))
-      count++;
-    else
-    {
-      if (type == "successor")
-    {
-      if((element_id[2].includes(id)==true)&&(elementconns.indexOf(element_id[1])==-1)&&(element_id[0].includes(type)==true))
+  for(;i<noOfElements;i++){
+        var element_id = pathele[i]["id"].split("_");
+        if(id=="*"&&(element_id[0].includes(type)==true))
           count++;
-    }
-    else
-    {
-      if((element_id[2].includes(id)==true)&&(elementconns.indexOf(element_id[1])==-1)&&(element_id[0].includes(type)==true))
-          count++;
-      else if (element_id[1].includes(id)==true &&(element_id[0].includes(type)==true))
-        count++;
-    }
-    }
-  });
-  if (type=="successor")
-    count+=elementconns.length;
+        else
+        {
+              if (type == "successor")
+              {
+                  if((element_id[2].includes(nodeuid)==true)&&(element_id[0].includes(type)==true))
+                      count++;
+              }
+              else
+              {
+                  if((element_id[2].includes(nodeuid)==true)&&(element_id[0].includes(type)==true))
+                      count++;
+                  else if (element_id[1].includes(nodeuid)==true &&(element_id[0].includes(type)==true))
+                    count++;
+              }
+        }
+  }
   return count;
 }
 
@@ -406,7 +420,11 @@ function setModalText(d,type)
   var circle  = d;
   var state="";
   var uptime= "";
-  var element  = circle["name"];
+  var history_interval = "";
+  if (Object.keys(d).indexOf("interval")!=-1)
+      history_interval = d["interval"];
+
+  var element  = circle["name"]+"_"+history_interval;
   state = state + circle["state"];
   var temptime = circle["starttime"];
   temptime = new Date(temptime*1000);
@@ -463,9 +481,16 @@ function closemodal(event)
 }
 
 
-function buildmanagednodetopology(nodedatas, eleuid)
+function buildmanagednodetopology()
 {
-    var innerRadiusManagedTopology = innerRadius-150;
+    var nodedatas = arguments[0], eleuid = arguments[1];
+    var innerRadiusManagedTopology, h_interval = arguments[2];
+
+    if (h_interval=="")
+        innerRadiusManagedTopology = innerRadius -100;
+    else
+        innerRadiusManagedTopology = innerRadius;
+
     var managednodecluster = d3.layout.cluster()
     .size([360, innerRadiusManagedTopology])
     .sort(null)
@@ -524,35 +549,43 @@ function buildmanagednodetopology(nodedatas, eleuid)
 function getunmanagednodes(event)
 {
     var node_id = event.target.parentNode.id;
-    var nodeuid = node_id.substring(0,node_id.indexOf("_modal_content"));
-    var node_topology = document.getElementById("managednode_topology_"+nodeuid+"_modal");
+    var nodedetails = node_id.substring(0,node_id.indexOf("_modal_content"));
+    var nodeuid = nodedetails.split("_")[0],
+        history_interval = nodedetails.split("_")[1];
+    var node_topology = document.getElementById("managednode_topology_"+nodedetails+"_modal");
 
     if (node_topology.style.display == "")
     {
         // nodedetaillist contains current state. transform to switch topology
+        if (history_interval=="")
+            nodedetaillist = $("#topology").find("circle");
+        else
+            nodedetaillist = $("#topology_"+history_interval).find("circle");
+        var noOfElements = nodedetaillist["length"],i=0;
+        nodedetaillist = Object.values(nodedetaillist);
         var switchnode = {"links":{}}
-        nodedetaillist.forEach(function(ndunman) {
-            if(ndunman["uid"] == nodeuid) {
-                switchnode["name"] = ndunman["ip4"];
-                switchnode["links"]["successor"] = ndunman["unmanagednodelist"];
-                return;
+        for (;i<noOfElements;i++) {
+            if(nodedetaillist[i]["__data__"]["uid"] == nodeuid) {
+                switchnode["name"] = nodedetaillist[i]["__data__"]["ip4"];
+                switchnode["links"]["successor"] = nodedetaillist[i]["__data__"]["unmanagednodelist"];
+                break;
             }
-        });
-        if(switchnode["name"].length > 0) {
+        }
+        if(switchnode["links"]["successor"].length > 0) {
             linknodes = [];
             switchnode["links"]["successor"].forEach(function(unmanlinknode) {
                 linknodes.push({"name":unmanlinknode, "links":{"successor":[switchnode["name"]]}});
             });
             linknodes.push(switchnode);
-            buildmanagednodetopology({"response":linknodes}, nodeuid);
+            buildmanagednodetopology({"response":linknodes}, nodedetails,history_interval);
         }
     }
     else
     {
         node_topology.style.display ="block";
-        document.getElementById(nodeuid+"_modal_table_content").style.display = "none";
-        document.getElementById(nodeuid+"_modal_back").style.display = "block";
-        document.getElementById(nodeuid+"_modal_getunmanagednodes").style.display = "none";
+        document.getElementById(nodedetails+"_modal_table_content").style.display = "none";
+        document.getElementById(nodedetails+"_modal_back").style.display = "block";
+        document.getElementById(nodedetails+"_modal_getunmanagednodes").style.display = "none";
     }
 }
 
