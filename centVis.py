@@ -61,6 +61,7 @@ def getNodeHistory(starttime, endtime):
         for tt in node['history']:
             insinfo = ndinfo.copy()
             insinfo.update(tt)
+            insinfo['interval'] = str(tt['timestamp'])
             outp[tt['timestamp']].append(insinfo)
     return dict(outp)
 
