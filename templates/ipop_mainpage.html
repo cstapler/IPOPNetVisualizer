@@ -73,7 +73,7 @@
                          <input type="button" onclick="getHistory(event,'general')" value="General History" class="btn btn-default"/>
                     </div>
                     <div class="row" style="text-align:center;">
-                        <div class="row" style="text-align:center;color:black;">
+                        <div class="row" style="text-align:center;color:white;">
                             from
                         </div>
                         <div class="row" style="color:black;">
@@ -84,7 +84,7 @@
                                 <option value="PM">PM</option>
                             </select>
                         </div>
-                        <div class="row" style="text-align:center;color:black;">
+                        <div class="row" style="text-align:center;color:white;">
                             to
                         </div>
                         <div class="row" style="color:black;">
@@ -95,7 +95,9 @@
                                 <option value="PM">PM</option>
                             </select>
                         </div>
+                        <div class="row" style="padding-top:10px;">
                         <input type="button" onclick="getHistory(event,'fixedinterval')" value="Interval History" class="btn btn-default">
+                        </div>
                     </div>
                 </div>
             </div>
@@ -104,8 +106,7 @@
             <div class="loader" id="loading"></div>
             <div id="topology"></div>
         </div>
-        <div class="col-md-2" id="NodeDetails" style="padding-left:0px; padding-right: 0px">
-        </div>
+        <div class="col-md-2" id="NodeDetails" style="padding-left:0px; padding-right: 0px"></div>
         <div id="ModalDetails"></div>
       </div>
       <div class="row text-pos col-md-12" style="margin-top: 15px; border-top: 5px solid #f37021;">
