@@ -157,19 +157,19 @@ def getURIGraph():
     flash(json.dumps(outputdata))
     return redirect(url_for('getGraphDetailsTemplate'))
 
-@app.route('/History/getTopologyHistoryData', methods=['GET', 'POST'])
+@app.route('/History/getTopologySnapshotData', methods=['GET', 'POST'])
 @cross_origin()
 def loadHistoryTemplate():
     starttime = str(request.query_string).split(",")
     outputdata = networkdetails
-    responseMsg = {"response": outputdata}
+    responseMsg = {"response": outputdata,"error":""}
     resp = make_response(json.dumps(responseMsg))
     resp.headers['Content-Type'] = "application/json"
     return resp
 
 
 # History webservice functionality for a particular UID
-@app.route('/History/getTopologyHistory', methods=['GET', 'POST'])
+@app.route('/History/getTopologySnapshot', methods=['GET', 'POST'])
 @cross_origin()
 def loadhistory():
     return render_template('ipop_history.html')

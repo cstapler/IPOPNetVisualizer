@@ -13,11 +13,11 @@ function callWebservice()
   $.ajax({
             type: "GET",
             method: "GET",
-            url: "http://"+serverip+"/History/getTopologyHistoryData",
+            url: "http://"+serverip+"/History/getTopologySnapshotData",
             contentType: "application/text",
             datatype:"text",
-            data: {"starttime":localStorage.getItem("starttime"),
-                   "endtime":localStorage.getItem("endtime"),
+            data: {
+                   "endtime":localStorage.getItem("endtime")
                   },
             crossDomain:true,
             timeout : 5000,
@@ -35,6 +35,12 @@ function callWebservice()
 function buildpage(data)
 {
     var topologyhistory = data["response"]
+    var error = data["error"]
+    if (error.length > 0)
+    {
+        alert(error);
+        return;
+    }
     if (Object.keys(topologyhistory).length == 0)
         return;
     for (var ival in topologyhistory)
