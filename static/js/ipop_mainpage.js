@@ -107,32 +107,18 @@ function setStoppedNodes(nodeList)
 
 function getHistory(event,type)
 {
-    if (type=="general")
-    {
-        localStorage.setItem("starttime", "0");
-        localStorage.setItem("endtime", Date.now());
-    }
-    else
-    {
-        var from_hour= document.getElementById("fromhour").value;
-        var from_minutes = document.getElementById("fromminutes").value;
-        var from_ampm= document.getElementById("fromduration").value;
-        if (from_ampm=="PM")
-            from_hour = (parseInt(from_hour) + 12).toString();
-        var to_hour = document.getElementById("tohour").value;
-        var to_minutes = document.getElementById("tominutes").value;
-        var to_ampm= document.getElementById("toduration").value;
-        if (to_ampm=="PM")
-            to_hour = (parseInt(to_hour) + 12).toString();
+   var to_hour = document.getElementById("tohour").value;
+   var to_minutes = document.getElementById("tominutes").value;
+   var to_ampm= document.getElementById("toduration").value;
+   if (to_ampm=="PM")
+       to_hour = (parseInt(to_hour) + 12).toString();
 
-        var currenttimestamp = new Date();
-        var start_time  = new Date(currenttimestamp.getFullYear(),currenttimestamp.getMonth(),currenttimestamp.getDate(),from_hour,from_minutes,0,0);
-        var end_time = new Date(currenttimestamp.getFullYear(),currenttimestamp.getMonth(),currenttimestamp.getDate(),to_hour,to_minutes,0,0);
-        localStorage.setItem("starttime", start_time.getTime());
-        localStorage.setItem("endtime", end_time.getTime());
-    }
-    window.open("http://"+serverip+"/History/getTopologyHistory", "History"+windowcount, "width=1000,height=600");
-    windowcount+=1;
+   var currenttimestamp = new Date();
+   var end_time = new Date(currenttimestamp.getFullYear(),currenttimestamp.getMonth(),currenttimestamp.getDate(),to_hour,to_minutes,0,0);
+
+   localStorage.setItem("endtime", end_time.getTime());
+   window.open("http://"+serverip+"/History/getTopologySnapshot", "Snapshot"+windowcount, "width=1000,height=600");
+   windowcount+=1;
 
 }
 

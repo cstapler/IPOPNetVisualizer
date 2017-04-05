@@ -68,36 +68,17 @@
             </div>
             <div class="row" style="background-color: #003040;">
                 <h4><span class="plus" onclick="show(event,'history');">+ </span>Topology History</h4>
-                <div id="history" style="display:none;">
-                    <div class="row" style="text-align:center;">
-                         <input type="button" onclick="getHistory(event,'general')" value="General History" class="btn btn-default"/>
+                <div id="history" style="display:none;text-align:center;">
+                    <div class="row" style="color:black;">
+                        <input type="text" list="hour" id="tohour" style="width:40px">
+                        <input type="text" list="minutes" id="tominutes" style="width:40px">
+                        <select id=toduration style="color:black;">
+                            <option value="AM">AM</option>
+                            <option value="PM">PM</option>
+                        </select>
                     </div>
-                    <div class="row" style="text-align:center;">
-                        <div class="row" style="text-align:center;color:white;">
-                            from
-                        </div>
-                        <div class="row" style="color:black;">
-                            <input type="text" list="hour" id="fromhour" style="width:40px">
-                            <input type="text" list="minutes" id="fromminutes" style="width:40px">
-                            <select id=fromduration style="color:black;">
-                                <option value="AM">AM</option>
-                                <option value="PM">PM</option>
-                            </select>
-                        </div>
-                        <div class="row" style="text-align:center;color:white;">
-                            to
-                        </div>
-                        <div class="row" style="color:black;">
-                            <input type="text" list="hour" id="tohour" style="width:40px">
-                            <input type="text" list="minutes" id="tominutes" style="width:40px"`>
-                            <select id=toduration style="color:black;">
-                                <option value="AM">AM</option>
-                                <option value="PM">PM</option>
-                            </select>
-                        </div>
-                        <div class="row" style="padding-top:10px;">
-                        <input type="button" onclick="getHistory(event,'fixedinterval')" value="Interval History" class="btn btn-default">
-                        </div>
+                    <div class="row" style="padding-top:10px;">
+                        <input type="button" onclick="getHistory(event,'fixedinterval')" value="Topology Snapshot" class="btn btn-default">
                     </div>
                 </div>
             </div>
