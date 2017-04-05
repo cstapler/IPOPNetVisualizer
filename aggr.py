@@ -1,12 +1,13 @@
 #!/usr/bin/env python
 
+import visualizerConfig
 import time, json, sys, logging, urllib2, json
 from flask import Flask, make_response, render_template, request, flash, redirect, url_for
 from flask_cors import CORS, cross_origin
 from pymongo import MongoClient
 from threading import Lock, Thread
 
-batchdelay = 5
+batchdelay = visualizerConfig.aggr_conf['batchdelay']
 
 py_ver = sys.version_info[0]
 log = logging.getLogger('werkzeug')
@@ -21,9 +22,12 @@ lock = Lock()
 statkeys = ('uid', 'name', 'node_name', 'mac', 'ip4', 'starttime', 'GeoIP')
 dkeys = ('links', 'timestamp', 'macuidmapping', 'state', 'sendcount', 'receivecount', 'unmanagednodelist')
 mc = MongoClient()
-mc.drop_database('ipop_db')
-ipopdb = mc.ipop_db
-nodeData = ipopdb.nd
+if visualizerConfig.aggr_conf['clear_on_start']:
+    mc.drop_database(visualizerConfig.conf['dbname'])
+ipopdb = mc[visualizerConfig.conf['dbname']]
+nodeData = ipopdb[visualizerConfig.conf['colname']]
+if visualizerConfig.aggr_conf['clear_on_start']:
+    ipopdb['shareddata'].insert_one({"name":"firstaggrt", "timestamp":(int(time.time()) + batchdelay*2)})
 tempbatch = {}
 
 # Receives data from IPOP Controllers
@@ -34,7 +38,7 @@ def listener():
     #print "inserting", msg
     lock.acquire()
     tempbatch[msg["uid"]] = msg
-    # update uptime with aggregator timezone
+    # update uptime with aggregator timezone - done in batchtimer
     lock.release()
     return "200"
 
@@ -65,28 +69,26 @@ def batchtimer():
         lock.release()
         currtime = int(time.time()) # all the timestamps are modified to currtime - to change TZ and set a common time ref
         for msg in toprocess.itervalues():
-            msg["starttime"] = msg["timestamp"] = currtime # set starttime for setOnInsert, if upsert, only push history
-            res = nodeData.update_one({"uid":msg["uid"]}, {"$push":{"history":{dk:msg[dk] for dk in dkeys}}, "$setOnInsert":{sk:msg[sk] for sk in statkeys}}, upsert=True)
-            if res.upserted_id != None and len(msg["GeoIP"].strip()) > 0: # upsert took place
-                # update location
-                res = nodeData.update_one({"uid":msg["uid"]}, {"$set":{"location":getloc(msg["GeoIP"])}})
+            try:
+                msg["starttime"] = msg["timestamp"] = currtime # set starttime for setOnInsert, if upsert, only push history
+                res = nodeData.update_one({"uid":msg["uid"]}, {"$push":{"history":{dk:msg[dk] for dk in dkeys}}, "$setOnInsert":{sk:msg[sk] for sk in statkeys}}, upsert=True)
+                if res.upserted_id != None and len(msg["GeoIP"].strip()) > 0: # upsert took place
+                    # update location
+                    res = nodeData.update_one({"uid":msg["uid"]}, {"$set":{"location":getloc(msg["GeoIP"])}})
+            except Exception, e:
+                print "Error in batchtimer", e
+                print msg
 
 def main(ipv4):
     bthread = Thread(target=batchtimer)
     bthread.start()
-    app.run(host=ipv4,port=8888,threaded=True)                             # Start the IPOP webserver
+    app.run(host=ipv4,port=visualizerConfig.aggr_conf['port'],threaded=True)                             # Start the IPOP webserver
 
 if __name__ == "__main__":
     if len(sys.argv)>1:
         ipv4 = sys.argv[1]
     else:
-        ipv4 = '0.0.0.0'
-        #print("Server IP details required!!")
-        #print("Enter Server IP::")
-        #if py_ver == 2:
-        #    ipv4 = str(raw_input())
-        #else:
-        #    ipv4 = str(input())
+        ipv4 = visualizerConfig.aggr_conf['ip']
     try:
         main(ipv4)
     except Exception as err:

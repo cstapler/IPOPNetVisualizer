@@ -238,9 +238,9 @@ function mouseclick(d)
   }
   else
   {
-      if (subgraphNodeDetails.indexOf(element)==-1)
+      if (subgraphNodeDetails.indexOf(d["name"])==-1)
       {
-        subgraphNodeDetails.push(element);
+        subgraphNodeDetails.push(d["name"]);
         subgraphNodeNameDetails.push(d["node_name"]);
       }
       document.getElementById("nodedisplaytext").setAttribute("value",subgraphNodeNameDetails.join());
@@ -429,7 +429,7 @@ function setModalText(d,type)
   var temptime = circle["starttime"];
   temptime = new Date(temptime*1000);
 
-  var macuidmappingstr = "<p id='"+element+"_modal_maccontent'"+"><H3>UID- MAC Details</H3><table id='macidmapping'><tr><th width='15%'>Node Name</th><th width='30%' align='center'>Unique ID</th><th width='50%'> MAC Details</th></tr>";
+  var macuidmappingstr = "<p id='"+element+"_modal_maccontent'"+"><H3>Peer List</H3><table id='macidmapping'><tr><th width='15%'>Node Name</th><th width='30%' align='center'>Unique ID</th><th width='50%'> MAC Details</th></tr>";
   for (obj in circle["macuidmapping"])
   {
     var i;
