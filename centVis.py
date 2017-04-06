@@ -16,7 +16,6 @@ CORS(app)
 
 #Initializing Global variables
 mc = MongoClient()
-# mc.drop_database('ipop_db') - aggregator drops it on start
 ipopdb = mc[visualizerConfig.conf['dbname']]
 nodeData = ipopdb[visualizerConfig.conf['colname']]
 firstaggrt = ipopdb['shareddata'].find_one({"name":"firstaggrt"})['timestamp']
@@ -25,7 +24,11 @@ firstaggrtstr = time.strftime('%Y-%m-%d %I:%M:%S %p', time.localtime(firstaggrt)
 timeout = visualizerConfig.vis_conf['timeout']
 stoptimeout = 45 # not used anymore
 log = logging.getLogger('werkzeug')
-log.setLevel(logging.ERROR)
+log.setLevel(visualizerConfig.vis_conf['log_level'])
+logfh = logging.FileHandler("./" + visualizerConfig.vis_conf['log_filename'])
+logform = logging.Formatter(fmt='[%(asctime)s] %(message)s')
+logfh.setFormatter(logform)
+log.addHandler(logfh)
 
 #Displays the IPOP Homepage
 @app.route('/IPOP')

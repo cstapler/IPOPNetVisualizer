@@ -7,17 +7,20 @@ from flask_cors import CORS, cross_origin
 from pymongo import MongoClient
 from threading import Lock, Thread
 
-batchdelay = visualizerConfig.aggr_conf['batchdelay']
-
 py_ver = sys.version_info[0]
-log = logging.getLogger('werkzeug')
-log.setLevel(logging.ERROR)
-
 app = Flask(__name__)
 app.secret_key = 'IPOP VIS'
 CORS(app)
 
+log = logging.getLogger('werkzeug')
+log.setLevel(visualizerConfig.aggr_conf['log_level'])
+logfh = logging.FileHandler("./" + visualizerConfig.aggr_conf['log_filename'])
+logform = logging.Formatter(fmt='[%(asctime)s] %(message)s')
+logfh.setFormatter(logform)
+log.addHandler(logfh)
+
 #Initializing Global variables
+batchdelay = visualizerConfig.aggr_conf['batchdelay']
 lock = Lock()
 statkeys = ('uid', 'name', 'node_name', 'mac', 'ip4', 'starttime', 'GeoIP')
 dkeys = ('links', 'timestamp', 'macuidmapping', 'state', 'sendcount', 'receivecount', 'unmanagednodelist')
@@ -35,7 +38,7 @@ tempbatch = {}
 @cross_origin()
 def listener():
     msg = request.json
-    #print "inserting", msg
+    log.info("Received msg from " + msg['node_name'])
     lock.acquire()
     tempbatch[msg["uid"]] = msg
     # update uptime with aggregator timezone - done in batchtimer
