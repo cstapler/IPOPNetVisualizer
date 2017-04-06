@@ -28,6 +28,7 @@ logfh = logging.FileHandler("./" + visualizerConfig.vis_conf['log_filename'])
 logform = logging.Formatter(fmt='[%(asctime)s] %(message)s')
 logfh.setFormatter(logform)
 log.addHandler(logfh)
+app.logger.addHandler(logfh)
 
 #Displays the IPOP Homepage
 @app.route('/IPOP')
@@ -96,6 +97,9 @@ def getNodeStatus(filterNodes=None, attimems=None):
         # remove all stopped nodes that are not in current active links 
         torem = sNset - cLset
         currNodes = filter(lambda cn: cn['uid'] not in torem, currNodes)
+        currSet = {cn['uid'] for cn in currNodes}
+        for ni in range(len(currNodes)):
+            currNodes[ni]['links'] = filterlinks(currNodes[ni]['links'], currSet)
     elif filterNodes == None: # query for current state
         reftime = int(time.time()) - timeout
         for node in nodeData.find({}, {'history':{'$slice':-1}}):
@@ -113,6 +117,9 @@ def getNodeStatus(filterNodes=None, attimems=None):
         # remove all stopped nodes that are not in current active links 
         torem = sNset - cLset
         currNodes = filter(lambda cn: cn['uid'] not in torem, currNodes)
+        currSet = {cn['uid'] for cn in currNodes}
+        for ni in range(len(currNodes)):
+            currNodes[ni]['links'] = filterlinks(currNodes[ni]['links'], currSet)
     else: # query for subgraph at current state
         nlist = filterNodes
         pip = [{'$project':{'history':{'$arrayElemAt':['$history', -1]}, 'uid':1, 'mac':1, 'node_name':1, 'ip4':1, 'name':1, 'starttime':1, 'location':1, 'GeoIP':1}},
@@ -147,7 +154,7 @@ def getGraph():
     try:
         _, outputdata = getNodeStatus(nodelist)
     except Exception as err:
-        logging.error("Exception in Sub graph node details:"+str(err))
+        log.error("Exception in Sub graph node details:"+str(err))
     responseMsg = {"response": outputdata}
     resp = make_response(json.dumps(responseMsg))
     resp.headers['Content-Type'] = "application/json"
@@ -160,7 +167,7 @@ def loadHistorySnapshot():
     try:
         #print request.args, request.form, request.query_string
         timeend = int(request.args['endtime'])
-        responseMsg = {"error":''}
+        responseMsg = {"error":{}}
         if timeend/1000 > int(time.time()):
             responseMsg["error"] = {"error_msg":"Sorry, cannot query for future time"}
         elif timeend/1000 < firstaggrt:
@@ -169,9 +176,10 @@ def loadHistorySnapshot():
             outputdata = getNodeStatus(attimems=timeend)[1]
             responseMsg["response"] = {request.args['endtime']:outputdata}
     except Exception as err:
-        logging.error("Exception in history node details:"+str(err))
+        log.error("Exception in history node details:"+str(err))
         responseMsg = {"response":{}, "error":{"error_msg":"Error retrieving data"}}
     #print responseMsg
+    log.debug(responseMsg)
     resp = make_response(json.dumps(responseMsg))
     resp.headers['Content-Type'] = "application/json"
     return resp
@@ -186,7 +194,7 @@ def loadHistoryTemplate():
     #try:
     outputdata = getNodeHistory(timest, timeend)
     #except Exception as err:
-    #    logging.error("Exception in history node details:"+str(err))
+    #    log.error("Exception in history node details:"+str(err))
     responseMsg = {"response": outputdata}
     resp = make_response(json.dumps(responseMsg))
     resp.headers['Content-Type'] = "application/json"
@@ -212,8 +220,8 @@ def nodedata():
         resp.headers['Content-Type'] = "application/json"
         return resp
     except Exception as err:
-        logging.info("Exception occured in nodedata function.")
-        logging.error("Exception::"+str(err))
+        log.info("Exception occured in nodedata function.")
+        log.error("Exception::"+str(err))
 
 def main(ipv4):
     app.run(host=ipv4,port=visualizerConfig.vis_conf['port'],threaded=True)                             # Start the IPOP webserver
