@@ -19,7 +19,6 @@ mc = MongoClient()
 ipopdb = mc[visualizerConfig.conf['dbname']]
 nodeData = ipopdb[visualizerConfig.conf['colname']]
 firstaggrt = ipopdb['shareddata'].find_one({"name":"firstaggrt"})['timestamp']
-firstaggrtstr = time.strftime('%Y-%m-%d %I:%M:%S %p', time.localtime(firstaggrt))
 
 timeout = visualizerConfig.vis_conf['timeout']
 stoptimeout = 45 # not used anymore
@@ -161,17 +160,17 @@ def loadHistorySnapshot():
     try:
         #print request.args, request.form, request.query_string
         timeend = int(request.args['endtime'])
-        # check if future time!
-        #print timeend
-        outputdata = getNodeStatus(attimems=timeend)[1]
         responseMsg = {"error":''}
-        if len(outputdata) == 0:
-            responseMsg["error"] = "Sorry, the time selected is invalid. Please select a time later than " + firstaggrtstr
+        if timeend/1000 > int(time.time()):
+            responseMsg["error"] = {"error_msg":"Sorry, cannot query for future time"}
+        elif timeend/1000 < firstaggrt:
+            responseMsg["error"] = {"error_msg":"Sorry, the time selected is invalid. Please select a time later than", "error_time":firstaggrt}
         else:
+            outputdata = getNodeStatus(attimems=timeend)[1]
             responseMsg["response"] = {request.args['endtime']:outputdata}
     except Exception as err:
         logging.error("Exception in history node details:"+str(err))
-        responseMsg = {"response":{}, "error":"Error retrieving data"}
+        responseMsg = {"response":{}, "error":{"error_msg":"Error retrieving data"}}
     #print responseMsg
     resp = make_response(json.dumps(responseMsg))
     resp.headers['Content-Type'] = "application/json"

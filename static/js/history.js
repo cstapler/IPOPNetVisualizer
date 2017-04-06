@@ -36,9 +36,14 @@ function buildpage(data)
 {
     var topologyhistory = data["response"]
     var error = data["error"]
-    if (error.length > 0)
+    if ("error_msg" in error)
     {
-        alert(error);
+        errmsg = error["error_msg"];
+        if ("error_time" in error) {
+            temptime = new Date(error["error_time"]*1000);
+            errmsg += ' ' + temptime.toString();
+        }
+        alert(errmsg);
         return;
     }
     if (Object.keys(topologyhistory).length == 0)
