@@ -107,14 +107,8 @@ function setStoppedNodes(nodeList)
 
 function getHistory(event,type)
 {
-   var to_hour = document.getElementById("tohour").value;
-   var to_minutes = document.getElementById("tominutes").value;
-   var to_ampm= document.getElementById("toduration").value;
-   if (to_ampm=="PM")
-       to_hour = (parseInt(to_hour) + 12).toString();
-
-   var currenttimestamp = new Date();
-   var end_time = new Date(currenttimestamp.getFullYear(),currenttimestamp.getMonth(),currenttimestamp.getDate(),to_hour,to_minutes,0,0);
+   var histtime = document.getElementById("hist-time").value;
+   var end_time = new Date(histtime.replace(/-/g,'/').replace('T',' '));
 
    localStorage.setItem("endtime", end_time.getTime());
    window.open("http://"+serverip+"/History/getTopologySnapshot", "Snapshot"+windowcount, "width=1000,height=600");
