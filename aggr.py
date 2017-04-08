@@ -21,8 +21,9 @@ log.addHandler(logfh)
 
 #Initializing Global variables
 batchdelay = visualizerConfig.aggr_conf['batchdelay']
+loction_update_delay = visualizerConfig.aggr_conf['location_update_delay']
 lock = Lock()
-statkeys = ('uid', 'name', 'node_name', 'mac', 'ip4', 'starttime', 'GeoIP')
+statkeys = ('uid', 'name', 'node_name', 'mac', 'ip4', 'starttime')
 dkeys = ('links', 'timestamp', 'macuidmapping', 'state', 'sendcount', 'receivecount', 'unmanagednodelist')
 mc = MongoClient()
 if visualizerConfig.aggr_conf['clear_on_start']:
@@ -67,6 +68,7 @@ def batchtimer():
     global tempbatch # need to process the batch
     while True:
         time.sleep(batchdelay) # wait for batchdelay seconds
+        log.info("Running batchtimer")
         lock.acquire()  # acquire lock and atomically swap with empty dict
         tempbatch, toprocess = {}, tempbatch
         lock.release()
@@ -74,17 +76,29 @@ def batchtimer():
         for msg in toprocess.itervalues():
             try:
                 msg["starttime"] = msg["timestamp"] = currtime # set starttime for setOnInsert, if upsert, only push history
-                res = nodeData.update_one({"uid":msg["uid"]}, {"$push":{"history":{dk:msg[dk] for dk in dkeys}}, "$setOnInsert":{sk:msg[sk] for sk in statkeys}}, upsert=True)
+                res = nodeData.update_one({"uid":msg["uid"]}, {"$push":{"history":{dk:msg[dk] for dk in dkeys}}, '$set':{'GeoIP':msg['GeoIP']}, "$setOnInsert":{sk:msg[sk] for sk in statkeys}}, upsert=True)
                 if res.upserted_id != None and len(msg["GeoIP"].strip()) > 0: # upsert took place
                     # update location
                     res = nodeData.update_one({"uid":msg["uid"]}, {"$set":{"location":getloc(msg["GeoIP"])}})
             except Exception, e:
-                print "Error in batchtimer", e
-                print msg
+                log.error("Error in batchtimer" + e + "\nmsg: " + msg)
+
+def locationtimer():
+    while True:
+        time.sleep(loction_update_delay)
+        log.info("Running locationtimer")
+        try:
+            for node in nodeData.find({}, {'uid':1, 'GeoIP':1}):
+                if len(node['GeoIP'].strip()) > 0:
+                    nodeData.update_one({'uid':node['uid']}, {'$set':{'location':getloc(node['GeoIP'])}})
+        except Exception, e:
+            log.error("Error in locationtimer" + e + "\nnode: " + msg)
 
 def main(ipv4):
     bthread = Thread(target=batchtimer)
     bthread.start()
+    locthread = Thread(target=locationtimer)
+    locthread.start()
     app.run(host=ipv4,port=visualizerConfig.aggr_conf['port'],threaded=True)                             # Start the IPOP webserver
 
 if __name__ == "__main__":
