@@ -67,12 +67,11 @@ body {
   stroke-width: 4px;
 }
 .valueclass {
-    padding-left: 20px;
+    padding-left: 5px;
     font: 300 15px "Helvetica Neue", Helvetica, Arial, sans-serif;
     word-wrap: break-word;
 }
 .keyclass {
-    width: 40%;
     font-weight: bold;
     font: 300 15px "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
@@ -80,13 +79,14 @@ body {
     background-color: grey;
     font-weight: bold;
     font: 300 20px "Helvetica Neue", Helvetica, Arial, sans-serif;
-    width : 150%;
+    width : 43%;
 }
 .textbox {
     margin-top: 30px;
     margin-right: 0px;
     border-right: 0px;
     position: fixed;
+    width : 60%;
 }
 #topology{
     overflow-x: scroll;
@@ -163,6 +163,7 @@ body {
     word-wrap: break-word;
     margin:auto;
     width: 100%;
+    color: black;
 }
 .logo {
   height : 59px;

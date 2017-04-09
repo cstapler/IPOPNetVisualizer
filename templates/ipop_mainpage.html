@@ -15,14 +15,14 @@
           <div>IPOP Visualizer</div>
       </div>
       <div class="row col-md-12">
-        <div class="col-md-2" id="network" style="padding-right:0px;color:white;margin-right: 0px;">
+        <div class="col-md-3" id="network" style="padding-right:0px;color:white;margin-right: 0px;">
             <div class="row" style="background-color: #003040;">
                 <h4><span class="plus" onclick="show(event,'linksettings');">+  </span>Link Settings</h4>
                 <div id="linksettings" style="display:none;">
                     <div class="row" style="margin-left: 20px;">
                         Use below drop down to select Link Type
                     </div>
-                    <div class="dropdown row" style="padding-right:0px;padding-left: 85px;">
+                    <div class="dropdown row" style="text-align:center;">
                       <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">
                          Link Type
                          <span class="caret"></span>
@@ -43,10 +43,10 @@
                     <div class="row" style="text-align:center; width:90%; margin-left:20px">
                         <input type="text" id="nodedisplaytext" readonly>
                     </div>
-                    <div class="row" style="padding-left: 75px;">
+                    <div class="row" style="padding-left:125px;">
                         <input type="button" id="getgraphstate" onclick="getsubgraph(event)" value="Get SubGraph" class="btn btn-default" style="background-color:grey;">
                     </div>
-                    <div class="row" style="padding-left: 95px;">
+                    <div class="row" style="padding-left:135px;">
                         <input type="button" id="resetgraphstate" onclick="resetgraph(event)" value="Submit" class="btn btn-default" style="display:none;background-color: grey;">
                     </div>
                 </div>
@@ -77,12 +77,14 @@
                     </div>
                 </div>
             </div>
+            <div style="padding-left:10 px;">
+                <div id="NodeDetails"></div>
+            </div>
           </div>
-        <div class="col-md-7">
+        <div class="col-md-9">
             <div class="loader" id="loading"></div>
             <div id="topology"></div>
         </div>
-        <div class="col-md-2" id="NodeDetails" style="padding-left:0px; padding-right: 0px"></div>
         <div id="ModalDetails"></div>
       </div>
       <div class="row text-pos col-md-12" style="margin-top: 15px; border-top: 5px solid #f37021;">
