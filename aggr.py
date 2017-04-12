@@ -60,7 +60,7 @@ def getloc(geoip):
             locdata['longitude'] = geod['longitude']
             locdata['country'] = geod['country_name']
     except Exception, e:
-        print "Error in getloc: ", e
+        log.error("Error in getloc: " + str(e.message))
         return {}
     return locdata
 
@@ -77,11 +77,12 @@ def batchtimer():
             try:
                 msg["starttime"] = msg["timestamp"] = currtime # set starttime for setOnInsert, if upsert, only push history
                 res = nodeData.update_one({"uid":msg["uid"]}, {"$push":{"history":{dk:msg[dk] for dk in dkeys}}, '$set':{'GeoIP':msg['GeoIP']}, "$setOnInsert":{sk:msg[sk] for sk in statkeys}}, upsert=True)
+                # MongoDB document has a hard limit of 16MB and this can potentially overflow. Gives a kind of error in the UpdateResult document 'res', but difficult to log just the error
                 if res.upserted_id != None and len(msg["GeoIP"].strip()) > 0: # upsert took place
                     # update location
                     res = nodeData.update_one({"uid":msg["uid"]}, {"$set":{"location":getloc(msg["GeoIP"])}})
             except Exception, e:
-                log.error("Error in batchtimer" + e + "\nmsg: " + msg)
+                log.error("Error in batchtimer" + str(e.message) + "\nmsg: " + str(msg))
 
 def locationtimer():
     while True:
@@ -92,7 +93,7 @@ def locationtimer():
                 if len(node['GeoIP'].strip()) > 0:
                     nodeData.update_one({'uid':node['uid']}, {'$set':{'location':getloc(node['GeoIP'])}})
         except Exception, e:
-            log.error("Error in locationtimer" + e + "\nnode: " + msg)
+            log.error("Error in locationtimer" + str(e.message) + "\nnode: " + str(msg))
 
 def main(ipv4):
     bthread = Thread(target=batchtimer)
