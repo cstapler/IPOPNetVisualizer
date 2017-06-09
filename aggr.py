@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import visualizerConfig
-import time, json, sys, logging, urllib2, json
+import time, json, sys, logging, urllib, json
 from flask import Flask, make_response, render_template, request, flash, redirect, url_for
 from flask_cors import CORS, cross_origin
 from pymongo import MongoClient
@@ -50,7 +50,7 @@ def getloc(geoip):
     locdata = {}
     try:
         #{u'status': u'success', u'data': {u'geo': {u'city': u'Gainesville', u'dma_code': u'592', u'ip': u'70.171.32.182', u'region': u'FL', u'isp': u'Cox Communications Inc. ', u'area_code': u'352', u'continent_code': u'NA', u'datetime': u'2017-03-29 15:02:00', u'latitude': u'29.573099136353', u'host': u'70.171.32.182', u'postal_code': u'32608', u'longitude': u'-82.407600402832', u'country_code': u'US', u'country_name': u'United States', u'timezone': u'America/New_York', u'asn': u'AS22773', u'rdns': u'ip70-171-32-182.ga.at.cox.net'}}, u'description': u'Data successfully received.'}
-        resp = urllib2.urlopen("https://tools.keycdn.com/geo.json?host=" + geoip)
+        resp = urllib.urlopen("https://tools.keycdn.com/geo.json?host=" + geoip)
         geod = json.loads(resp.read())
         if geod['status'] == 'success':
             geod = geod['data']['geo']
@@ -59,7 +59,7 @@ def getloc(geoip):
             locdata['latitude'] = geod['latitude']
             locdata['longitude'] = geod['longitude']
             locdata['country'] = geod['country_name']
-    except Exception, e:
+    except Exception as e:
         log.error("Error in getloc: " + str(e.message))
         return {}
     return locdata
@@ -73,7 +73,7 @@ def batchtimer():
         tempbatch, toprocess = {}, tempbatch
         lock.release()
         currtime = int(time.time()) # all the timestamps are modified to currtime - to change TZ and set a common time ref
-        for msg in toprocess.itervalues():
+        for msg in toprocess.values():
             try:
                 msg["starttime"] = msg["timestamp"] = currtime # set starttime for setOnInsert, if upsert, only push history
                 res = nodeData.update_one({"uid":msg["uid"]}, {"$push":{"history":{dk:msg[dk] for dk in dkeys}}, '$set':{'GeoIP':msg['GeoIP']}, "$setOnInsert":{sk:msg[sk] for sk in statkeys}}, upsert=True)
@@ -81,7 +81,7 @@ def batchtimer():
                 if res.upserted_id != None and len(msg["GeoIP"].strip()) > 0: # upsert took place
                     # update location
                     res = nodeData.update_one({"uid":msg["uid"]}, {"$set":{"location":getloc(msg["GeoIP"])}})
-            except Exception, e:
+            except Exception as e:
                 log.error("Error in batchtimer" + str(e.message) + "\nmsg: " + str(msg))
 
 def locationtimer():
@@ -92,7 +92,7 @@ def locationtimer():
             for node in nodeData.find({}, {'uid':1, 'GeoIP':1}):
                 if len(node['GeoIP'].strip()) > 0:
                     nodeData.update_one({'uid':node['uid']}, {'$set':{'location':getloc(node['GeoIP'])}})
-        except Exception, e:
+        except Exception as e:
             log.error("Error in locationtimer" + str(e.message) + "\nnode: " + str(msg))
 
 def main(ipv4):
