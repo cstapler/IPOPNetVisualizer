@@ -3,6 +3,10 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+#aggr and visualizer log files
+aggr.log
+centVis.log
+
 # PyInstaller
 #  Usually these files are written by a python script from a template
 #  before PyInstaller builds the exe, so as to inject date/other infos into it.
