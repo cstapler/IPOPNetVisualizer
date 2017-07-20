@@ -24,7 +24,7 @@ batchdelay = visualizerConfig.aggr_conf['batchdelay']
 loction_update_delay = visualizerConfig.aggr_conf['location_update_delay']
 lock = Lock()
 statkeys = ('uid', 'name', 'node_name', 'mac', 'ip4', 'starttime')
-dkeys = ('links', 'timestamp', 'macuidmapping', 'state', 'sendcount', 'receivecount', 'unmanagednodelist')
+dkeys = ('links', 'timestamp', 'macuidmapping', 'state', 'unmanagednodelist')
 mc = MongoClient()
 if visualizerConfig.aggr_conf['clear_on_start']:
     mc.drop_database(visualizerConfig.conf['dbname'])
