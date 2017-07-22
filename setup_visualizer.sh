@@ -1,6 +1,6 @@
 #!/bin/bash
 sudo apt-get install -y mongodb
-python -m pip install virtualenv
+pip install --user virtualenv
 python -m virtualenv venv
 source ./venv/bin/activate
 python -m pip install -r requirements.txt
